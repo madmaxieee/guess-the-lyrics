@@ -4,6 +4,9 @@ import { api } from "@/utils/api";
 
 export default function Home() {
   const hello = api.example.hello.useQuery({ text: "from tRPC" });
+  const lyrics = api.lyrics.fromQuery.useQuery({
+    query: "taylor swift all too well",
+  });
 
   return (
     <>
@@ -42,7 +45,7 @@ export default function Home() {
             </Link>
           </div>
           <p className="text-2xl text-white">
-            {hello.data ? hello.data.greeting : "Loading tRPC query..."}
+            {lyrics.data ? lyrics.data.lyrics : "Loading lyrics..."}
           </p>
         </div>
       </main>
