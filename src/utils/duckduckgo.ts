@@ -1,4 +1,5 @@
 import { JSDOM } from "jsdom";
+
 import { userAgent } from "./userAgent";
 
 type DuckDuckGoResultItem = {

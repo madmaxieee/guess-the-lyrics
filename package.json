@@ -23,6 +23,7 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^4.2.0",
     "@types/eslint": "^8.37.0",
     "@types/jsdom": "^21.1.1",
     "@types/node": "^18.16.0",

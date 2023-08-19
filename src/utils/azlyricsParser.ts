@@ -1,12 +1,13 @@
 import { JSDOM } from "jsdom";
+
 import { userAgent } from "./userAgent";
 
 type SongData = {
   title: string;
   artist: string;
+  lyrics: string;
   album?: string;
   coverPhoto?: string;
-  lyrics: string;
 };
 
 export async function getSongData(url: string) {
