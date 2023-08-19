@@ -1,14 +1,14 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { search } from "@/utils/duckduckgo";
-import { getLyrics } from "@/utils/azlyricsParser";
+import { getSongData } from "@/utils/azlyricsParser";
 
 export const lyricsRouter = createTRPCRouter({
-  fromKey: publicProcedure
-    .input(z.object({ key: z.string().regex(/[a-z\/]+/) }))
+  fromID: publicProcedure
+    .input(z.object({ id: z.string().regex(/[a-z\/]+/) }))
     .query(({ input }) => {
       return {
-        lyrics: `Hello ${input.key}`,
+        lyrics: `Hello ${input.id}`,
       };
     }),
 
@@ -17,7 +17,7 @@ export const lyricsRouter = createTRPCRouter({
     .query(async ({ input }) => {
       const result = await search(`azlyrics ${input.query}`);
       const { url } = result.first();
-      const { lyrics } = await getLyrics(url);
-      return { lyrics };
+      const songData = await getSongData(url);
+      return songData;
     }),
 });
