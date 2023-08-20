@@ -1,55 +1,76 @@
-import { useEffect, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { useImmer } from "use-immer";
+
+import { cn } from "@/utils";
+import type { SongData } from "@/utils/azlyricsParser";
 
 import { Input } from "./ui/input";
 
 type GuessTheLyricsProps = {
-  lyrics: string;
+  songData: SongData;
 };
 
-export default function GuessTheLyrics({ lyrics }: GuessTheLyricsProps) {
+export default function GuessTheLyrics({
+  songData: { lyrics, title, artist, album },
+}: GuessTheLyricsProps) {
   const [score, setScore] = useState(0);
   const [currentWord, setCurrentWord] = useState("");
-  const answerRef = useRef(lyrics.split(/\s+/));
-  const answerMap = useRef<Record<string, number[]>>({});
+
+  const answerArray = useMemo(() => lyrics.split(/\s+/), [lyrics]);
+  const totalWords = useMemo(() => answerArray.length, [answerArray]);
+  const answerMap = useMemo(() => {
+    const map: Record<string, number[]> = {};
+    answerArray.forEach((word, index) => {
+      const key = word.toLowerCase().replace(/[^a-z]/g, "");
+      map[key] ??= [];
+      map[key]!.push(index);
+    });
+    return map;
+  }, [answerArray]);
+
   const [isCorrect, setIsCorrect] = useImmer<boolean[]>(
-    answerRef.current.map(() => false)
+    answerArray.map(() => false)
   );
 
-  useEffect(() => {
-    answerRef.current.forEach((word, index) => {
-      const key = word.toLowerCase().replace(/[^a-z]/g, "");
-      answerMap.current[key] ??= [];
-      answerMap.current[key]!.push(index);
-    });
-  }, []);
-
-  const totalWords = answerRef.current.length;
+  const [lastCorrect, setLastCorrect] = useState<Set<number>>(new Set());
 
   const updateCurrentWord = (word: string) => {
     const key = word.toLowerCase().replace(/[^a-z]/g, "");
-    if (key in answerMap.current) {
-      const correctIndices = [...answerMap.current[key]!];
+    if (answerMap[key]) {
+      const correctIndices = [...answerMap[key]!];
+
+      setLastCorrect(new Set(correctIndices));
+
       setIsCorrect((draft) => {
         correctIndices.forEach((index) => {
           draft[index] = true;
         });
       });
-      const newScore = score + answerMap.current[key]!.length;
+
+      const newScore = score + correctIndices.length;
       setScore(newScore);
       if (newScore === totalWords) {
         alert("You win!");
       }
+
       setCurrentWord("");
-      delete answerMap.current[key];
+
+      delete answerMap[key];
     } else {
       setCurrentWord(word);
     }
   };
 
   return (
-    <div>
+    <div className="mx-10vw container flex max-w-5xl flex-col items-center justify-center gap-6 px-4 py-12">
+      <h1 className="text-5xl font-extrabold tracking-tight sm:text-[4rem]">
+        {title}
+      </h1>
+      <h2 className="text-3xl font-extrabold tracking-tight sm:text-[2rem]">
+        {artist}
+      </h2>
+      <p className="text-xl">{album}</p>
       <p>
         {score}/{totalWords}
       </p>
@@ -58,8 +79,14 @@ export default function GuessTheLyrics({ lyrics }: GuessTheLyricsProps) {
         onChange={(e) => updateCurrentWord(e.target.value)}
       />
       <p className="text-xl text-white">
-        {answerRef.current.map((word, index) => (
-          <span key={index} className="font-mono text-gray-500">
+        {answerArray.map((word, index) => (
+          <span
+            key={index}
+            className={cn(
+              "font-mono",
+              lastCorrect.has(index) ? "text-green-500" : "text-gray-500"
+            )}
+          >
             {isCorrect[index] ? word + " " : "_".repeat(word.length) + " "}
           </span>
         ))}

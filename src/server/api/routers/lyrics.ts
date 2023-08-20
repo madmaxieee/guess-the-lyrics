@@ -89,7 +89,7 @@ export const lyricsRouter = createTRPCRouter({
   fromQuery: publicProcedure
     .input(z.object({ query: z.string().min(1) }))
     .query(async ({ input }) => {
-      const result = await search(`azlyrics ${input.query}`);
+      const result = await search(`site:azlyrics.com ${input.query}`);
       const { url } = result.first();
       const songData = await getSongData(url);
       return songData;

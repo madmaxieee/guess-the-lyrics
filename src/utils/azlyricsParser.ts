@@ -2,7 +2,7 @@ import { JSDOM } from "jsdom";
 
 import { userAgent } from "./userAgent";
 
-type SongData = {
+export type SongData = {
   title: string;
   artist: string;
   lyrics: string;
@@ -11,8 +11,12 @@ type SongData = {
 };
 
 export async function getSongData(url: string) {
-  if (!/https:\/\/www\.azlyrics\.com\/lyrics\/[a-z]+\/[a-z]+\.html/.test(url)) {
-    throw new Error("Invalid azlyrics url");
+  if (
+    !/https:\/\/www\.azlyrics\.com\/lyrics\/[a-z0-9]+\/[a-z0-9]+\.html/.test(
+      url
+    )
+  ) {
+    throw new Error(`Invalid URL: ${url}`);
   }
 
   const response = await fetch(url, {

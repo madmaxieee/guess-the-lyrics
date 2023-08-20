@@ -1,10 +1,23 @@
+import { useRef, useState } from "react";
+
 import Head from "next/head";
 
 import GuessTheLyrics from "@/components/GuessTheLyrics";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { api } from "@/utils/api";
 
 export default function Home() {
-  const songData = api.lyrics.mock.useQuery();
+  const [query, setQuery] = useState("Taylow Swift all too well 10 min");
+  const songData = api.lyrics.fromQuery.useQuery({ query });
+  const searchBoxRef = useRef<HTMLInputElement>(null);
+
+  const search = () => {
+    const query = searchBoxRef.current?.value;
+    if (!query) return;
+    setQuery(query);
+  };
+
   return (
     <>
       <Head>
@@ -13,18 +26,17 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center">
-        <div className="mx-10vw container flex max-w-5xl flex-col items-center justify-center gap-6 px-4 py-12">
-          <h1 className="text-5xl font-extrabold tracking-tight sm:text-[4rem]">
-            {songData.data ? songData.data.title : "Loading song..."}
-          </h1>
-          <h2 className="text-3xl font-extrabold tracking-tight sm:text-[2rem]">
-            {songData.data ? songData.data.artist : "Loading artist..."}
-          </h2>
-          <p className="text-xl">
-            {songData.data ? songData.data.album : "Loading album..."}
-          </p>
-          {songData.data && <GuessTheLyrics lyrics={songData.data.lyrics} />}
+        <div className="flex max-w-4xl gap-4">
+          <Input className="flex-grow" ref={searchBoxRef} />
+          <Button variant="outline" onClick={search}>
+            search
+          </Button>
         </div>
+        {songData.data ? (
+          <GuessTheLyrics songData={songData.data} />
+        ) : (
+          <p>Loading...</p>
+        )}
       </main>
     </>
   );
