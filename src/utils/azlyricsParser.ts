@@ -1,8 +1,10 @@
 import { JSDOM } from "jsdom";
 
+import { url2id } from "./client";
 import { userAgent } from "./userAgent";
 
 export type SongData = {
+  id: string;
   title: string;
   artist: string;
   lyrics: string;
@@ -10,9 +12,9 @@ export type SongData = {
   coverPhoto?: string;
 };
 
-export async function getSongData(url: string) {
+export async function fetchSongData(url: string): Promise<SongData> {
   if (
-    !/https:\/\/www\.azlyrics\.com\/lyrics\/[a-z0-9]+\/[a-z0-9]+\.html/.test(
+    !/^https:\/\/www\.azlyrics\.com\/lyrics\/([a-z0-9]+\/[a-z0-9]+)\.html$/.test(
       url
     )
   ) {
@@ -23,10 +25,10 @@ export async function getSongData(url: string) {
     headers: { "User-Agent": userAgent() },
   });
   const html = await response.text();
-  return parseAZ(html);
+  return { ...parseAZ(html), id: url2id(url) };
 }
 
-function parseAZ(html: string): SongData {
+function parseAZ(html: string): Omit<SongData, "id"> {
   const document = new JSDOM(html).window.document;
 
   const h1 = document.querySelector("h1");

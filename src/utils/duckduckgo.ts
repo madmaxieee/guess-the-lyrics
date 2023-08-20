@@ -10,7 +10,7 @@ type DuckDuckGoResultItem = {
 
 export async function search(query: string) {
   const cleanedQuery = query.trim().replaceAll(/\s/g, "+");
-  const url = `https://lite.duckduckgo.com/lite/?q=${cleanedQuery}&ko=-2&kz=1`;
+  const url = `https://lite.duckduckgo.com/lite/?q=${cleanedQuery}`;
   const response = await fetch(url, {
     headers: { "User-Agent": userAgent() },
   });
@@ -37,7 +37,10 @@ class DuckDuckGoResult {
   }
 
   public first(): DuckDuckGoResultItem {
-    this._parse();
+    if (this._items.length === 0) {
+      this._parse();
+    }
+
     const firstItem = this._items[0];
     if (firstItem) {
       return firstItem;
@@ -47,7 +50,10 @@ class DuckDuckGoResult {
   }
 
   public items(): DuckDuckGoResultItem[] {
-    throw new Error("Not implemented Yet");
+    if (this._items.length === 0) {
+      this._parse();
+    }
+    return this._items;
   }
 
   private _parse() {
@@ -76,11 +82,10 @@ class DuckDuckGoResult {
         switch (i % 4) {
           case 0:
             // title
-            currentItem.title = (row.textContent ?? "")
-              .replace(/^\s*[0-9]+\./, "")
-              .trim();
+            const resultLinkElement = row.querySelector("a");
+            currentItem.title = resultLinkElement?.textContent ?? "";
 
-            currentItem.url = row.querySelector("a")?.href ?? "";
+            currentItem.url = resultLinkElement?.href ?? "";
             currentItem.url = currentItem.url.match(/https[^&]+/)?.[0] ?? "";
             currentItem.url = decodeURIComponent(currentItem.url);
 
