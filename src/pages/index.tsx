@@ -1,12 +1,11 @@
 import { useRef, useState } from "react";
 
 import Head from "next/head";
-import Link from "next/link";
 
+import SearchResult from "@/components/SearchResult";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { api } from "@/utils/api";
-import { url2id } from "@/utils/client";
 
 export default function Home() {
   const [query, setQuery] = useState("");
@@ -47,32 +46,15 @@ export default function Home() {
             <p>Error: {results.error.message}</p>
           ) : results.data ? (
             <ul className="flex flex-col gap-4">
-              {results.data.map((result) => {
-                const [artist, title] = splitOnce(result.title, /\s*-\s*/);
-                return (
-                  <li key={result.url}>
-                    <Link href={`/play/${url2id(result.url)}`}>
-                      <div className="flex w-full justify-between gap-8">
-                        <p className="grow font-bold">{title}</p>
-                        <p>{artist}</p>
-                      </div>
-                    </Link>
-                  </li>
-                );
-              })}
+              {results.data.map((result) => (
+                <li key={result.url}>
+                  <SearchResult result={result} />
+                </li>
+              ))}
             </ul>
           ) : null}
         </div>
       </main>
     </>
   );
-}
-
-function splitOnce(s: string, re: RegExp) {
-  const match = s.match(re);
-  if (!match) {
-    return [s];
-  }
-  const index = match.index ?? s.length;
-  return [s.slice(0, index), s.slice(index + match[0].length)];
 }

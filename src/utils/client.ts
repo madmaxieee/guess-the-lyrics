@@ -8,3 +8,12 @@ export function url2id(url: string): string {
     throw new Error(`Invalid URL: ${url}`);
   }
 }
+
+export function splitOnce(s: string, re: RegExp) {
+  const match = s.match(re);
+  if (!match) {
+    return [s];
+  }
+  const index = match.index ?? s.length;
+  return [s.slice(0, index), s.slice(index + match[0].length)];
+}

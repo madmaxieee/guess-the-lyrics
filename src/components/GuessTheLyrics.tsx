@@ -22,7 +22,7 @@ export default function GuessTheLyrics({
   const answerMap = useMemo(() => {
     const map: Record<string, number[]> = {};
     answerArray.forEach((word, index) => {
-      const key = word.toLowerCase().replace(/[^a-z]/g, "");
+      const key = toKey(word);
       map[key] ??= [];
       map[key]!.push(index);
     });
@@ -36,7 +36,7 @@ export default function GuessTheLyrics({
   const [lastCorrect, setLastCorrect] = useState<Set<number>>(new Set());
 
   const updateCurrentWord = (word: string) => {
-    const key = word.toLowerCase().replace(/[^a-z]/g, "");
+    const key = toKey(word);
     if (answerMap[key]) {
       const correctIndices = [...answerMap[key]!];
 
@@ -93,4 +93,8 @@ export default function GuessTheLyrics({
       </p>
     </div>
   );
+}
+
+function toKey(word: string) {
+  return word.toLowerCase().replace(/[^a-z0-9]/g, "");
 }
