@@ -25,11 +25,28 @@ export async function fetchSongData(url: string): Promise<SongData> {
     headers: { "User-Agent": userAgent() },
   });
   const html = await response.text();
-  return { ...parseAZ(html), id: url2id(url) };
+
+  try {
+    const songData = parseAZ(html);
+    return {
+      ...songData,
+      id: url2id(url),
+    };
+  } catch (e) {
+    console.error(e);
+    throw Error(
+      `Failed to parse AZLyrics page: ${url}, this song may not exist`
+    );
+  }
 }
 
 function parseAZ(html: string): Omit<SongData, "id"> {
   const document = new JSDOM(html).window.document;
+
+  // normal lyrics page only has one h1
+  if (document.querySelectorAll("h1").length > 1) {
+    throw new Error("Multiple h1 elements found");
+  }
 
   const h1 = document.querySelector("h1");
   const title =

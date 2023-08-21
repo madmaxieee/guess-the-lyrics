@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { TRPCError } from "@trpc/server";
+
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { fetchSongData } from "@/utils/azlyricsParser";
 import { search } from "@/utils/duckduckgo";
@@ -29,8 +31,16 @@ export const lyricsRouter = createTRPCRouter({
   fromAZid: publicProcedure
     .input(z.object({ id: z.string().regex(/[a-z0-9]+\/[a-z0-9]+/) }))
     .query(async ({ input }) => {
-      const url = `https://www.azlyrics.com/lyrics/${input.id}.html`;
-      const songData = await fetchSongData(url);
-      return songData;
+      try {
+        const url = `https://www.azlyrics.com/lyrics/${input.id}.html`;
+        const songData = await fetchSongData(url);
+        return songData;
+      } catch (e) {
+        console.error(e);
+        throw new TRPCError({
+          message: "Invalid ID",
+          code: "BAD_REQUEST",
+        });
+      }
     }),
 });

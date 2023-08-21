@@ -7,6 +7,11 @@ export default function GamePage() {
   const router = useRouter();
   const id = `${router.query.artist as string}/${router.query.song as string}`;
   const songData = api.lyrics.fromAZid.useQuery({ id });
+
+  if (songData.isError) {
+    router.push("/").catch(console.error);
+  }
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
       {songData.isLoading ? (
