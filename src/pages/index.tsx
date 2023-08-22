@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 
 import Head from "next/head";
 
+import Header from "@/components/Header";
 import SearchResult, { SearchResultSkeleton } from "@/components/SearchResult";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,7 +13,8 @@ const RESULT_LIMIT = 8;
 
 export default function Home() {
   const [query, setQuery] = useState("");
-  const results = api.lyrics.search.useQuery({ query, topN: 8 });
+  // const results = api.lyrics.search.useQuery({ query, topN: 8 });
+  const results = api.mock.searchResults.useQuery({ query, topN: 8 });
 
   const searchBoxRef = useRef<HTMLInputElement>(null);
 
@@ -36,10 +38,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="h-full min-h-screen flex-col items-center">
-        <div className="container flex flex-col items-start justify-between space-y-2 py-4 sm:flex-row sm:items-center sm:space-y-0 md:h-16">
-          <h2 className="text-lg font-semibold">guess the lyrics</h2>
-        </div>
-        <Separator />
+        <Header />
         <div className="mx-auto mt-8 max-w-4xl text-xl">
           <div className="my-6 flex justify-center gap-4">
             <Input className="w-72" ref={searchBoxRef} onKeyUp={onEnter} />

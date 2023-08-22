@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 
 import GuessTheLyrics from "@/components/GuessTheLyrics";
+import Header from "@/components/Header";
 import { api } from "@/utils/api";
 
 export default function GamePage() {
@@ -14,7 +15,8 @@ export default function GamePage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center">
+    <main className="flex min-h-screen flex-col items-center">
+      <Header />
       {songData.isLoading ? (
         <p>Loading...</p>
       ) : songData.isError ? (
