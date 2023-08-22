@@ -1,14 +1,16 @@
 import { useRouter } from "next/router";
 
-import GuessTheLyrics from "@/components/GuessTheLyrics";
+import GuessTheLyrics, {
+  GuessTheLyricsSkeleton,
+} from "@/components/GuessTheLyrics";
 import Header from "@/components/Header";
 import { api } from "@/utils/api";
 
 export default function GamePage() {
   const router = useRouter();
   const id = `${router.query.artist as string}/${router.query.song as string}`;
-  const songData = api.lyrics.fromAZid.useQuery({ id });
-  // const songData = api.mock.songData.useQuery();
+  // const songData = api.lyrics.fromAZid.useQuery({ id });
+  const songData = api.mock.songData.useQuery();
 
   if (songData.isError) {
     router.push("/").catch(console.error);
@@ -18,7 +20,7 @@ export default function GamePage() {
     <main className="flex min-h-screen flex-col items-center">
       <Header />
       {songData.isLoading ? (
-        <p>Loading...</p>
+        <GuessTheLyricsSkeleton />
       ) : songData.isError ? (
         <p>Error: {songData.error.message}</p>
       ) : songData.data ? (

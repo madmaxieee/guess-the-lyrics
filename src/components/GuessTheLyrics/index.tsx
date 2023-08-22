@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 
+import { Skeleton } from "../ui/skeleton";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { useImmer } from "use-immer";
 
@@ -131,17 +132,16 @@ export default function GuessTheLyrics({
             </Button>
           )}
         </div>
-        <p className="text-xl text-white">
+        <p className="font-mono text-xl text-gray-500">
           {answerArray.map((word, index) => (
             <span
               key={index}
               className={cn(
-                "font-mono",
                 gameEnded && !isCorrect[index]
                   ? "text-red-500"
                   : !gameEnded && lastCorrect.has(index)
                   ? "text-green-500"
-                  : "text-gray-500"
+                  : null
               )}
             >
               {gameEnded || isCorrect[index]
@@ -160,6 +160,35 @@ export default function GuessTheLyrics({
         </DialogContent>
       </Dialog>
     </>
+  );
+}
+
+export function GuessTheLyricsSkeleton() {
+  return (
+    <div className="mx-10vw container flex max-w-5xl flex-col items-center justify-center gap-6 px-4 py-12">
+      <div className="flex justify-between gap-12">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <Skeleton className="h-56 w-56 rounded-xl" />
+        <div className="flex max-w-5xl flex-col justify-center gap-4">
+          <Skeleton className="my-6 h-16 w-96" />
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-8 w-32" />
+        </div>
+      </div>
+      <div className="flex w-full items-center gap-8 px-16">
+        <Input className="grow text-xl" disabled />
+        <Skeleton className="h-10 w-56" />
+        <Skeleton className="h-10 w-56" />
+        <Button className="whitespace-nowrap" variant="destructive" disabled>
+          give up
+        </Button>
+      </div>
+      <div className="flex w-full flex-col gap-4">
+        {Array.from(Array(15), (_, index) => (
+          <Skeleton key={index} className="h-6 w-full" />
+        ))}
+      </div>
+    </div>
   );
 }
 
