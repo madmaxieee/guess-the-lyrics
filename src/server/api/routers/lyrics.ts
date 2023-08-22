@@ -28,17 +28,17 @@ export const lyricsRouter = createTRPCRouter({
       return topTitleUrl;
     }),
 
-  fromAZid: publicProcedure
-    .input(z.object({ id: z.string().regex(/[a-z0-9]+\/[a-z0-9]+/) }))
+  fromAZpath: publicProcedure
+    .input(z.object({ path: z.string().regex(/[a-z0-9]+\/[a-z0-9]+/) }))
     .query(async ({ input }) => {
       try {
-        const url = `https://www.azlyrics.com/lyrics/${input.id}.html`;
+        const url = `https://www.azlyrics.com/lyrics/${input.path}.html`;
         const songData = await fetchSongData(url);
         return songData;
       } catch (e) {
         console.error(e);
         throw new TRPCError({
-          message: "Invalid ID",
+          message: "Invalid path",
           code: "BAD_REQUEST",
         });
       }

@@ -1,4 +1,4 @@
-export function url2id(url: string): string {
+export function url2path(url: string): string {
   const match = url.match(
     /https:\/\/www\.azlyrics\.com\/lyrics\/([a-z0-9]+\/[a-z0-9]+)\.html/
   );

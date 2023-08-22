@@ -1,10 +1,10 @@
 import { JSDOM } from "jsdom";
 
-import { url2id } from "./client";
+import { url2path } from "./client";
 import { userAgent } from "./userAgent";
 
 export type SongData = {
-  id: string;
+  path: string;
   title: string;
   artist: string;
   lyrics: string;
@@ -30,7 +30,7 @@ export async function fetchSongData(url: string): Promise<SongData> {
     const songData = parseAZ(html);
     return {
       ...songData,
-      id: url2id(url),
+      path: url2path(url),
     };
   } catch (e) {
     console.error(e);

@@ -13,8 +13,8 @@ const RESULT_LIMIT = 8;
 
 export default function Home() {
   const [query, setQuery] = useState("");
-  // const results = api.lyrics.search.useQuery({ query, topN: 8 });
-  const results = api.mock.searchResults.useQuery({ query, topN: 8 });
+  const results = api.lyrics.search.useQuery({ query, topN: 8 });
+  // const results = api.mock.searchResults.useQuery({ query, topN: 8 });
 
   const searchBoxRef = useRef<HTMLInputElement>(null);
 
