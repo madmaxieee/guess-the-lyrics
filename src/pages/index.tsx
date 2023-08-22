@@ -2,14 +2,17 @@ import { useRef, useState } from "react";
 
 import Head from "next/head";
 
-import SearchResult from "@/components/SearchResult";
+import SearchResult, { SearchResultSkeleton } from "@/components/SearchResult";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
 import { api } from "@/utils/api";
+
+const RESULT_LIMIT = 8;
 
 export default function Home() {
   const [query, setQuery] = useState("");
-  const results = api.lyrics.search.useQuery({ query });
+  const results = api.lyrics.search.useQuery({ query, topN: 8 });
 
   const searchBoxRef = useRef<HTMLInputElement>(null);
 
@@ -32,23 +35,37 @@ export default function Home() {
         <meta name="description" content="guess the lyrics game" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="flex min-h-screen flex-col items-center justify-center">
-        <div className="flex gap-4">
-          <Input className="flex-grow" ref={searchBoxRef} onKeyUp={onEnter} />
-          <Button variant="outline" onClick={search}>
-            search
-          </Button>
+      <main className="h-full min-h-screen flex-col items-center">
+        <div className="container flex flex-col items-start justify-between space-y-2 py-4 sm:flex-row sm:items-center sm:space-y-0 md:h-16">
+          <h2 className="text-lg font-semibold">guess the lyrics</h2>
         </div>
-        <div className="mt-8 max-w-4xl text-xl">
+        <Separator />
+        <div className="mx-auto mt-8 max-w-4xl text-xl">
+          <div className="my-6 flex justify-center gap-4">
+            <Input className="w-72" ref={searchBoxRef} onKeyUp={onEnter} />
+            <Button variant="outline" onClick={search}>
+              search
+            </Button>
+          </div>
           {results.isLoading ? (
-            <p>Loading...</p>
+            <ul className="mx-auto flex max-w-2xl flex-col gap-3">
+              {Array.from(Array(RESULT_LIMIT), (_, index) => (
+                <li key={index}>
+                  <SearchResultSkeleton />
+                  <Separator className="mt-3" />
+                </li>
+              ))}
+            </ul>
           ) : results.isError ? (
             <p>Error: {results.error.message}</p>
+          ) : results.data?.length === 0 ? (
+            <p>No results</p>
           ) : results.data ? (
-            <ul className="flex flex-col gap-4">
+            <ul className="mx-auto flex max-w-2xl flex-col gap-3">
               {results.data.map((result) => (
                 <li key={result.url}>
                   <SearchResult result={result} />
+                  <Separator className="mt-3" />
                 </li>
               ))}
             </ul>

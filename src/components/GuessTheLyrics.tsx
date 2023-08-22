@@ -2,8 +2,8 @@ import { useMemo, useState } from "react";
 
 import { useImmer } from "use-immer";
 
-import { cn } from "@/utils";
 import type { SongData } from "@/utils/azlyricsParser";
+import { cn } from "@/utils/ui";
 
 import { Input } from "./ui/input";
 

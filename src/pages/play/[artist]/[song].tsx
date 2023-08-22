@@ -7,6 +7,7 @@ export default function GamePage() {
   const router = useRouter();
   const id = `${router.query.artist as string}/${router.query.song as string}`;
   const songData = api.lyrics.fromAZid.useQuery({ id });
+  // const songData = api.mock.songData.useQuery();
 
   if (songData.isError) {
     router.push("/").catch(console.error);

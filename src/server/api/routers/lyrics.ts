@@ -8,24 +8,24 @@ import { search } from "@/utils/duckduckgo";
 
 export const lyricsRouter = createTRPCRouter({
   search: publicProcedure
-    .input(z.object({ query: z.string() }))
+    .input(z.object({ query: z.string(), topN: z.number().max(20).default(5) }))
     .query(async ({ input }) => {
-      if (input.query === "") return [];
+      if (input.query === "") return null;
       const result = await search(`site:azlyrics.com ${input.query}`);
-      const top5 = result
+      const topResults = result
         .items()
         .filter((result) =>
           result.url.startsWith("https://www.azlyrics.com/lyrics/")
         )
-        .slice(0, 5);
-      const top5TitleUrl = top5.map((item) => ({
+        .slice(0, input.topN);
+      const topTitleUrl = topResults.map((item) => ({
         title: item.title.replace(
           /( \| Lyrics at AZLyrics\.com)|(\ Lyrics \| AZLyrics\.com)|( lyrics)|( - AZLyrics)$/,
           ""
         ),
         url: item.url,
       }));
-      return top5TitleUrl;
+      return topTitleUrl;
     }),
 
   fromAZid: publicProcedure

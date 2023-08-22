@@ -3,7 +3,7 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 
 const mockData = {
-  url: "https://www.azlyrics.com/lyrics/taylorswift/lovestory.html",
+  id: "taylorswift/lovestory",
   title: "Love Story",
   artist: "Taylor Swift",
   album: "Fearless",
@@ -86,20 +86,34 @@ const mockResults = [
     url: "https://www.azlyrics.com/lyrics/lionelrichie/hello.html",
   },
   {
-    title: "Eminem- Hello",
-    url: "https://www.azlyrics.com/lyrics/eminem/helloaa.html",
-  },
-  {
-    title: "Beyonce- Hello asdfasdf",
+    title: "Beyonce- Hello",
     url: "https://www.azlyrics.com/lyrics/beyonceknowles/hello.html",
   },
   {
     title: "Eminem- Hello",
     url: "https://www.azlyrics.com/lyrics/eminem/hello.html",
   },
+  {
+    title: "Eminem- Hello",
+    url: "https://www.azlyrics.com/lyrics/eminem/hello1.html",
+  },
+  {
+    title: "Eminem- Hello",
+    url: "https://www.azlyrics.com/lyrics/eminem/hello2.html",
+  },
+  {
+    title: "Eminem- Hello",
+    url: "https://www.azlyrics.com/lyrics/eminem/hello3.html",
+  },
+  {
+    title: "Eminem- Hello",
+    url: "https://www.azlyrics.com/lyrics/eminem/hello4.html",
+  },
 ];
 
 export const mockRouter = createTRPCRouter({
   songData: publicProcedure.query(() => mockData),
-  searchResults: publicProcedure.query(() => mockResults),
+  searchResults: publicProcedure
+    .input(z.object({ query: z.string(), topN: z.number().max(20).default(5) }))
+    .query(({ input }) => mockResults.slice(0, input.topN)),
 });
