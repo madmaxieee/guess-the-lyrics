@@ -7,17 +7,17 @@ import { useImmer } from "use-immer";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import type { SongData } from "@/utils/azlyricsParser";
+import { type RouterOutput } from "@/utils/routerTypes";
 import { cn } from "@/utils/ui";
 
 import Timer from "./Timer";
 
 type GuessTheLyricsProps = {
-  songData: SongData;
+  songData: Exclude<RouterOutput["lyrics"]["fromAZpath"], null>;
 };
 
 export default function GuessTheLyrics({
-  songData: { lyrics, title, artist, album, coverPhoto },
+  songData: { lyrics, title, artist, album, coverPhotoURL: coverPhoto },
 }: GuessTheLyricsProps) {
   const [score, setScore] = useState(0);
   const [currentWord, setCurrentWord] = useState("");
@@ -77,12 +77,14 @@ export default function GuessTheLyrics({
     <>
       <div className="mx-10vw container flex max-w-5xl flex-col items-center justify-center gap-6 px-4 py-12">
         <div className="flex justify-between gap-12">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={coverPhoto}
-            alt="Album cover"
-            className="h-56 w-56 rounded-xl"
-          />
+          {coverPhoto && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={coverPhoto}
+              alt="Album cover"
+              className="h-56 w-56 rounded-xl"
+            />
+          )}
           <div className="flex max-w-5xl flex-col justify-center gap-4">
             <h1 className="my-6 text-6xl font-extrabold">{title}</h1>
             <h2 className="text-4xl font-extrabold">{artist}</h2>

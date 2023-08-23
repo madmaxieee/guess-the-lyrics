@@ -1,13 +1,14 @@
 import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
+import { type SongData } from "@/utils/azlyricsParser";
 
-const mockData = {
-  id: "taylorswift/lovestory",
+const mockData: SongData = {
+  path: "taylorswift/lovestory",
   title: "Love Story",
   artist: "Taylor Swift",
   album: "Fearless",
-  coverPhoto:
+  coverPhotoURL:
     "https://www.azlyrics.com/images/albums/699/28b9efd2b441f00110868e34ee368189.jpg",
   lyrics:
     "We were both young when I first saw you\n" +

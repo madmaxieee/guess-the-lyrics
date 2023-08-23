@@ -8,8 +8,8 @@ export type SongData = {
   title: string;
   artist: string;
   lyrics: string;
-  album?: string;
-  coverPhoto?: string;
+  album: string | null;
+  coverPhotoURL: string | null;
 };
 
 export async function fetchSongData(url: string): Promise<SongData> {
@@ -40,7 +40,7 @@ export async function fetchSongData(url: string): Promise<SongData> {
   }
 }
 
-function parseAZ(html: string): Omit<SongData, "id"> {
+function parseAZ(html: string): Omit<SongData, "id" | "path"> {
   const document = new JSDOM(html).window.document;
 
   // normal lyrics page only has one h1
@@ -84,7 +84,7 @@ function parseAZ(html: string): Omit<SongData, "id"> {
       title,
       artist,
       album,
-      coverPhoto,
+      coverPhotoURL: coverPhoto ?? null,
       lyrics,
     };
   } else {
@@ -92,6 +92,8 @@ function parseAZ(html: string): Omit<SongData, "id"> {
       title,
       artist,
       lyrics,
+      album: null,
+      coverPhotoURL: null,
     };
   }
 }

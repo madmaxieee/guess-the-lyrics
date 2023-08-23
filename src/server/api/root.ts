@@ -1,7 +1,9 @@
+import "@/db";
 import { createTRPCRouter } from "@/server/api/trpc";
 
 import { lyricsRouter } from "./routers/lyrics";
 import { mockRouter } from "./routers/mock";
+import { testRouter } from "./routers/test";
 
 /**
  * This is the primary router for your server.
@@ -11,6 +13,7 @@ import { mockRouter } from "./routers/mock";
 export const appRouter = createTRPCRouter({
   mock: mockRouter,
   lyrics: lyricsRouter,
+  test: testRouter,
 });
 
 // export type definition of API

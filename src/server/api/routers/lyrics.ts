@@ -1,9 +1,12 @@
+import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { TRPCError } from "@trpc/server";
 
+import db from "@/db";
+import { type Song, songs } from "@/db/schema";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
-import { fetchSongData } from "@/utils/azlyricsParser";
+import { type SongData, fetchSongData } from "@/utils/azlyricsParser";
 import { search } from "@/utils/duckduckgo";
 
 export const lyricsRouter = createTRPCRouter({
@@ -31,10 +34,31 @@ export const lyricsRouter = createTRPCRouter({
   fromAZpath: publicProcedure
     .input(z.object({ path: z.string().regex(/[a-z0-9]+\/[a-z0-9]+/) }))
     .query(async ({ input }) => {
+      const [dbSongData] = await db
+        .select({
+          title: songs.title,
+          artist: songs.artist,
+          album: songs.album,
+          coverPhotoURL: songs.coverPhotoURL,
+          lyrics: songs.lyrics,
+        })
+        .from(songs)
+        .where(eq(songs.path, input.path))
+        .execute();
+      if (dbSongData) {
+        return {
+          title: dbSongData.title,
+          artist: dbSongData.artist,
+          album: dbSongData.album,
+          coverPhotoURL: dbSongData.coverPhotoURL,
+          lyrics: dbSongData.lyrics ?? "",
+        };
+      }
+
+      let songData: SongData | null = null;
       try {
         const url = `https://www.azlyrics.com/lyrics/${input.path}.html`;
-        const songData = await fetchSongData(url);
-        return songData;
+        songData = await fetchSongData(url);
       } catch (e) {
         console.error(e);
         throw new TRPCError({
@@ -42,5 +66,26 @@ export const lyricsRouter = createTRPCRouter({
           code: "BAD_REQUEST",
         });
       }
+      if (!songData) {
+        return null;
+      }
+      db.insert(songs)
+        .values({
+          path: input.path,
+          title: songData.title,
+          artist: songData.artist,
+          album: songData.album,
+          coverPhotoURL: songData.coverPhotoURL,
+          lyrics: songData.lyrics,
+        })
+        .execute()
+        .catch(console.error);
+      return {
+        title: songData.title,
+        artist: songData.artist,
+        album: songData.album,
+        coverPhotoURL: songData.coverPhotoURL,
+        lyrics: songData.lyrics,
+      };
     }),
 });
