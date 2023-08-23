@@ -1,10 +1,11 @@
+import "dotenv/config";
 import { drizzle } from "drizzle-orm/planetscale-serverless";
+import { migrate } from "drizzle-orm/planetscale-serverless/migrator";
 
 import { connect } from "@planetscale/database";
 
-import { env } from "@/env.mjs";
+const env = process.env;
 
-// create the connection
 const connection = connect({
   host: env.DATABASE_HOST,
   username: env.DATABASE_USERNAME,
@@ -13,4 +14,6 @@ const connection = connect({
 
 const db = drizzle(connection);
 
-export default db;
+migrate(db, { migrationsFolder: "./drizzle" })
+  .then(() => console.log("migrated"))
+  .catch(console.error);

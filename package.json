@@ -7,7 +7,8 @@
     "dev": "next dev",
     "lint": "next lint",
     "start": "next start",
-    "postbuild": "next-sitemap"
+    "postbuild": "next-sitemap",
+    "migrate": "node ./scripts/migrate.mjs"
   },
   "dependencies": {
     "@planetscale/database": "^1.11.0",
@@ -53,6 +54,7 @@
     "@typescript-eslint/eslint-plugin": "6.0.0",
     "@typescript-eslint/parser": "6.0.0",
     "autoprefixer": "^10.4.14",
+    "dotenv": "^16.3.1",
     "drizzle-kit": "^0.19.13",
     "eslint": "^8.40.0",
     "eslint-config-next": "^13.4.2",
