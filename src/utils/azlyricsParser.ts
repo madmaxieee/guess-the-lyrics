@@ -1,4 +1,6 @@
+import { HttpsProxyAgent } from "https-proxy-agent";
 import { JSDOM } from "jsdom";
+import fetch from "node-fetch";
 import puppeteer, { type Browser } from "puppeteer-core";
 
 import { env } from "@/env.mjs";
@@ -15,6 +17,8 @@ export type SongData = {
   coverPhotoURL: string | null;
 };
 
+const scrape = env.NODE_ENV === "production" ? proxyScrape : fetchScrape;
+
 export async function fetchSongData(url: string): Promise<SongData> {
   if (
     !/^https:\/\/www\.azlyrics\.com\/lyrics\/([a-z0-9]+\/[a-z0-9]+)\.html$/.test(
@@ -24,8 +28,7 @@ export async function fetchSongData(url: string): Promise<SongData> {
     throw new Error(`Invalid URL: ${url}`);
   }
 
-  // const html = await fetchScrape(url);
-  const html = await puppeteerScrape(url);
+  const html = await scrape(url);
 
   try {
     const songData = parseAZ(html);
@@ -41,6 +44,7 @@ export async function fetchSongData(url: string): Promise<SongData> {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function puppeteerScrape(url: string) {
   let browser: Browser | null = null;
   try {
@@ -64,6 +68,15 @@ async function puppeteerScrape(url: string) {
 async function fetchScrape(url: string) {
   const response = await fetch(url, {
     headers: { "User-Agent": userAgent() },
+  });
+  return await response.text();
+}
+
+const proxyAgent = new HttpsProxyAgent(env.PROXY_URL);
+async function proxyScrape(url: string) {
+  const response = await fetch(url, {
+    headers: { "User-Agent": userAgent() },
+    agent: proxyAgent,
   });
   return await response.text();
 }

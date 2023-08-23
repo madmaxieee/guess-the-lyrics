@@ -14,6 +14,7 @@ export const env = createEnv({
     UPSTASH_TOKEN: z.string().min(1),
     UPSTASH_URL: z.string().min(1),
     BROWSERLESS_URL: z.string().url(),
+    PROXY_URL: z.string().url(),
   },
 
   /**
@@ -38,6 +39,7 @@ export const env = createEnv({
     UPSTASH_TOKEN: process.env.UPSTASH_TOKEN,
     UPSTASH_URL: process.env.UPSTASH_URL,
     BROWSERLESS_URL: process.env.BROWSERLESS_URL,
+    PROXY_URL: process.env.PROXY_URL,
     NEXT_PUBLIC_DOMAIN: process.env.NEXT_PUBLIC_DOMAIN,
   },
   /**
