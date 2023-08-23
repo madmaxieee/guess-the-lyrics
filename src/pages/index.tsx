@@ -1,6 +1,7 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import Head from "next/head";
+import { useRouter } from "next/router";
 
 import Header from "@/components/Header";
 import SEO from "@/components/SEO";
@@ -13,9 +14,10 @@ import { api } from "@/utils/api";
 const RESULT_LIMIT = 8;
 
 export default function Home() {
+  const router = useRouter();
   const [query, setQuery] = useState("");
-  const results = api.lyrics.search.useQuery({ query, topN: 8 });
   // const results = api.mock.searchResults.useQuery({ query, topN: 8 });
+  const results = api.lyrics.search.useQuery({ query, topN: 8 });
 
   const searchBoxRef = useRef<HTMLInputElement>(null);
 
@@ -23,6 +25,7 @@ export default function Home() {
     const query = searchBoxRef.current?.value;
     if (!query) return;
     setQuery(query);
+    router.push(`/?q=${query}`).catch(console.error);
   };
 
   const onEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -30,6 +33,19 @@ export default function Home() {
       search();
     }
   };
+
+  useEffect(() => {
+    if (router.query.q) {
+      setQuery(router.query.q as string);
+      if (searchBoxRef.current) {
+        searchBoxRef.current.value = router.query.q as string;
+      }
+    }
+  }, [router.query.q]);
+
+  useEffect(() => {
+    searchBoxRef.current?.focus();
+  }, []);
 
   return (
     <>

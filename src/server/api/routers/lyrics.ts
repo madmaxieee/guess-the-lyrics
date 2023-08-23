@@ -3,10 +3,12 @@ import { v4 as uuid } from "uuid";
 import { z } from "zod";
 
 import { TRPCError } from "@trpc/server";
+import { Ratelimit } from "@upstash/ratelimit";
 
 import db from "@/db";
 import redis from "@/db/redis";
 import { songs } from "@/db/schema";
+import { env } from "@/env.mjs";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { type SongData, fetchSongData } from "@/utils/azlyricsParser";
 import {
@@ -15,11 +17,41 @@ import {
 } from "@/utils/constants";
 import { search } from "@/utils/duckduckgo";
 
+const rateLimiter = {
+  fetch: new Ratelimit({
+    redis: redis,
+    prefix: "ratelimit:api",
+    limiter: Ratelimit.slidingWindow(10, "30 s"),
+    analytics: true,
+  }),
+  search: new Ratelimit({
+    redis: redis,
+    prefix: "ratelimit:api",
+    limiter: Ratelimit.slidingWindow(10, "10 s"),
+    analytics: true,
+  }),
+  other: new Ratelimit({
+    redis: redis,
+    prefix: "ratelimit:api",
+    limiter: Ratelimit.slidingWindow(10, "1 s"),
+    analytics: true,
+  }),
+};
+
 export const lyricsRouter = createTRPCRouter({
   search: publicProcedure
     .input(z.object({ query: z.string(), topN: z.number().max(20).default(5) }))
     .query(async ({ input }) => {
       if (input.query === "") return null;
+
+      const { success } = await rateLimiter.search.limit("search");
+      if (env.NODE_ENV === "production" && !success) {
+        throw new TRPCError({
+          code: "TOO_MANY_REQUESTS",
+          message: "Too many requests",
+        });
+      }
+
       const result = await search(`site:azlyrics.com ${input.query}`);
       const topResults = result
         .items()
@@ -69,6 +101,14 @@ export const lyricsRouter = createTRPCRouter({
         };
       }
 
+      const { success } = await rateLimiter.fetch.limit("fetch");
+      if (env.NODE_ENV === "production" && !success) {
+        throw new TRPCError({
+          code: "TOO_MANY_REQUESTS",
+          message: "Too many requests",
+        });
+      }
+
       let songData: SongData | null = null;
       try {
         const url = `https://www.azlyrics.com/lyrics/${input.path}.html`;
@@ -81,8 +121,12 @@ export const lyricsRouter = createTRPCRouter({
         });
       }
       if (!songData) {
-        return null;
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Invalid path",
+        });
       }
+
       db.insert(songs)
         .values({
           path: input.path,
@@ -106,6 +150,14 @@ export const lyricsRouter = createTRPCRouter({
   start: publicProcedure
     .input(z.object({ path: z.string().regex(/[a-z0-9]+\/[a-z0-9]+/) }))
     .mutation(async ({ input, ctx }) => {
+      const { success } = await rateLimiter.other.limit("start");
+      if (env.NODE_ENV === "production" && !success) {
+        throw new TRPCError({
+          code: "TOO_MANY_REQUESTS",
+          message: "Too many requests",
+        });
+      }
+
       if (ctx.cookies.gameSessionID) {
         const gameSessionID = ctx.cookies.gameSessionID;
         const createdAt = await redis.get(gameSessionID);
@@ -133,6 +185,14 @@ export const lyricsRouter = createTRPCRouter({
   count: publicProcedure
     .input(z.object({ path: z.string().regex(/[a-z0-9]+\/[a-z0-9]+/) }))
     .mutation(async ({ input, ctx }) => {
+      const { success } = await rateLimiter.other.limit("count");
+      if (env.NODE_ENV === "production" && !success) {
+        throw new TRPCError({
+          code: "TOO_MANY_REQUESTS",
+          message: "Too many requests",
+        });
+      }
+
       const gameSessionID = ctx.cookies.gameSessionID;
       if (!gameSessionID) {
         throw new TRPCError({
