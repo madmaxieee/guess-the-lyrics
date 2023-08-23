@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import ThemeToggle from "./ThemeToggle";
 import { Separator } from "./ui/separator";
 
 export default function Header() {
@@ -9,6 +10,7 @@ export default function Header() {
         <Link href="/">
           <h2 className="text-lg font-semibold">guess the lyrics</h2>
         </Link>
+        <ThemeToggle />
       </div>
       <Separator />
     </>
