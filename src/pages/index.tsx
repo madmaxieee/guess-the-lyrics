@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 
 import Head from "next/head";
+import Image from "next/image";
 import { useRouter } from "next/router";
 
+import banner from "@/assets/banner.svg";
 import Header from "@/components/Header";
 import SEO from "@/components/SEO";
 import SearchResult, { SearchResultSkeleton } from "@/components/SearchResult";
@@ -55,6 +57,12 @@ export default function Home() {
       </Head>
       <main className="h-full min-h-screen flex-col items-center">
         <Header />
+        <Image
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          src={banner}
+          className="mx-auto mt-8 max-w-4xl"
+          alt="Are you a real fan? guess the lyrics!"
+        />
         <div className="mx-auto mt-8 max-w-4xl text-xl">
           <div className="my-6 flex justify-center gap-4">
             <Input className="w-72" ref={searchBoxRef} onKeyUp={onEnter} />
