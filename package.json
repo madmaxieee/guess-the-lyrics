@@ -31,7 +31,7 @@
     "next": "^13.4.2",
     "next-sitemap": "^4.2.2",
     "next-themes": "^0.2.1",
-    "puppeteer": "^21.1.0",
+    "puppeteer-core": "^21.1.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "superjson": "^1.13.1",

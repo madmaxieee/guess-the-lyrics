@@ -1,5 +1,7 @@
 import { JSDOM } from "jsdom";
-import puppeteer, { type Browser } from "puppeteer";
+import puppeteer, { type Browser } from "puppeteer-core";
+
+import { env } from "@/env.mjs";
 
 import { url2path } from "./client";
 import { userAgent } from "./userAgent";
@@ -42,7 +44,9 @@ export async function fetchSongData(url: string): Promise<SongData> {
 async function puppeteerScrape(url: string) {
   let browser: Browser | null = null;
   try {
-    browser = await puppeteer.launch({ headless: "new" });
+    browser = await puppeteer.connect({
+      browserWSEndpoint: env.BROWSERLESS_URL,
+    });
     const page = await browser.newPage();
     await page.goto(url);
     return await page.content();
@@ -56,6 +60,7 @@ async function puppeteerScrape(url: string) {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function fetchScrape(url: string) {
   const response = await fetch(url, {
     headers: { "User-Agent": userAgent() },

@@ -13,6 +13,7 @@ export const env = createEnv({
     DATABASE_PASSWORD: z.string().min(1),
     UPSTASH_TOKEN: z.string().min(1),
     UPSTASH_URL: z.string().min(1),
+    BROWSERLESS_URL: z.string().url(),
   },
 
   /**
@@ -36,6 +37,7 @@ export const env = createEnv({
     DATABASE_PASSWORD: process.env.DATABASE_PASSWORD,
     UPSTASH_TOKEN: process.env.UPSTASH_TOKEN,
     UPSTASH_URL: process.env.UPSTASH_URL,
+    BROWSERLESS_URL: process.env.BROWSERLESS_URL,
     NEXT_PUBLIC_DOMAIN: process.env.NEXT_PUBLIC_DOMAIN,
   },
   /**
