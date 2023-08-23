@@ -120,12 +120,6 @@ export const lyricsRouter = createTRPCRouter({
           message: "Invalid path",
         });
       }
-      if (!songData) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Invalid path",
-        });
-      }
 
       db.insert(songs)
         .values({

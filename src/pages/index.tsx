@@ -58,6 +58,7 @@ export default function Home() {
       <main className="h-full min-h-screen flex-col items-center">
         <Header />
         <Image
+          priority
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           src={banner}
           className="mx-auto mt-8 max-w-4xl"
