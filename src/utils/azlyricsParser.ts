@@ -1,4 +1,5 @@
 import { JSDOM } from "jsdom";
+import puppeteer, { type Browser } from "puppeteer";
 
 import { url2path } from "./client";
 import { userAgent } from "./userAgent";
@@ -21,10 +22,8 @@ export async function fetchSongData(url: string): Promise<SongData> {
     throw new Error(`Invalid URL: ${url}`);
   }
 
-  const response = await fetch(url, {
-    headers: { "User-Agent": userAgent() },
-  });
-  const html = await response.text();
+  // const html = await fetchScrape(url);
+  const html = await puppeteerScrape(url);
 
   try {
     const songData = parseAZ(html);
@@ -38,6 +37,30 @@ export async function fetchSongData(url: string): Promise<SongData> {
       `Failed to parse AZLyrics page: ${url}, this song may not exist`
     );
   }
+}
+
+async function puppeteerScrape(url: string) {
+  let browser: Browser | null = null;
+  try {
+    browser = await puppeteer.launch({ headless: "new" });
+    const page = await browser.newPage();
+    await page.goto(url);
+    return await page.content();
+  } catch (e) {
+    console.error(e);
+    throw new Error(`Failed to scrape ${url}`);
+  } finally {
+    if (browser) {
+      await browser.close();
+    }
+  }
+}
+
+async function fetchScrape(url: string) {
+  const response = await fetch(url, {
+    headers: { "User-Agent": userAgent() },
+  });
+  return await response.text();
 }
 
 function parseAZ(html: string): Omit<SongData, "id" | "path"> {
