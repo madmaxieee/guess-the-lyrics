@@ -60,6 +60,10 @@ function parseAZ(html: string): Omit<SongData, "id" | "path"> {
 
   // select all div with no class
   const divs = document.querySelectorAll("div:not([class]):not([id])");
+  if (divs.length === 0) {
+    console.error(html);
+    throw new Error("No divs found");
+  }
   // find the longest div's text
   const lyricsDiv = Array.from(divs).reduce((prev, curr) => {
     if ((curr.textContent ?? "").length > (prev.textContent ?? "").length) {

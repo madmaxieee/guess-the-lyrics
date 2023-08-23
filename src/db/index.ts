@@ -13,8 +13,10 @@ const connection = connect({
 });
 
 const db = drizzle(connection);
-migrate(db, { migrationsFolder: "./drizzle" })
-  .then(() => console.log("migrated"))
-  .catch(console.error);
+if (env.NODE_ENV === "production") {
+  migrate(db, { migrationsFolder: "./drizzle" })
+    .then(() => console.log("migrated"))
+    .catch(console.error);
+}
 
 export default db;
