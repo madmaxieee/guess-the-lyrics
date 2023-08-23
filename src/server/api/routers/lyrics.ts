@@ -60,10 +60,12 @@ export const lyricsRouter = createTRPCRouter({
         )
         .slice(0, input.topN);
       const topTitleUrl = topResults.map((item) => ({
-        title: item.title.replace(
-          /( \| Lyrics at AZLyrics\.com)|(\ Lyrics \| AZLyrics\.com)|( lyrics)|( - AZLyrics)$/,
-          ""
-        ),
+        title: item.title
+          .replace(
+            /(\| Lyrics at AZLyrics\.com.*)|(Lyrics \| AZLyrics\.com.*)|(lyrics - AZLyrics.*)$/,
+            ""
+          )
+          .trim(),
         url: item.url,
       }));
       return topTitleUrl;
