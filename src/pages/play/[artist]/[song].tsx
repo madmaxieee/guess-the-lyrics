@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 import Head from "next/head";
 import { useRouter } from "next/router";
 
@@ -15,9 +17,16 @@ export default function GamePage() {
   const songData = api.lyrics.fromAZpath.useQuery({ path });
   // const songData = api.mock.songData.useQuery();
 
-  if (songData.isError) {
-    router.push("/").catch(console.error);
-  }
+  useEffect(() => {
+    if (songData.isError) {
+      const timeout = setTimeout(() => {
+        router.push("/").catch(console.error);
+      }, 3000);
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+  }, [router, songData.isError]);
 
   return (
     <>
@@ -30,7 +39,10 @@ export default function GamePage() {
         {songData.isLoading ? (
           <GuessTheLyricsSkeleton />
         ) : songData.isError ? (
-          <p>Error: {songData.error.message}</p>
+          <div className="mt-[30vh] text-center">
+            <h1 className="text-4xl font-bold">Error</h1>
+            <p className="text-xl">{songData.error?.message}</p>
+          </div>
         ) : songData.data && path ? (
           <GuessTheLyrics songData={songData.data} path={path} />
         ) : null}

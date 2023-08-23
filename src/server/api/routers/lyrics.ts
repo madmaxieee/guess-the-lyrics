@@ -48,7 +48,7 @@ export const lyricsRouter = createTRPCRouter({
       if (env.NODE_ENV === "production" && !success) {
         throw new TRPCError({
           code: "TOO_MANY_REQUESTS",
-          message: "Too many requests",
+          message: "Server is busy, try again later",
         });
       }
 
@@ -105,7 +105,7 @@ export const lyricsRouter = createTRPCRouter({
       if (env.NODE_ENV === "production" && !success) {
         throw new TRPCError({
           code: "TOO_MANY_REQUESTS",
-          message: "Too many requests",
+          message: "Server is busy, try again later",
         });
       }
 
@@ -154,7 +154,7 @@ export const lyricsRouter = createTRPCRouter({
       if (env.NODE_ENV === "production" && !success) {
         throw new TRPCError({
           code: "TOO_MANY_REQUESTS",
-          message: "Too many requests",
+          message: "Server is busy, try again later",
         });
       }
 
@@ -189,7 +189,7 @@ export const lyricsRouter = createTRPCRouter({
       if (env.NODE_ENV === "production" && !success) {
         throw new TRPCError({
           code: "TOO_MANY_REQUESTS",
-          message: "Too many requests",
+          message: "Server is busy, try again later",
         });
       }
 
