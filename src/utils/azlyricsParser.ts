@@ -113,7 +113,7 @@ function parseAZ(html: string): Omit<SongData, "id" | "path"> {
       return prev;
     }
   });
-  const lyrics = lyricsDiv.textContent?.trim?.() ?? "";
+  const lyrics = (lyricsDiv.textContent ?? "").replaceAll(/\[.*\]/g, "").trim();
 
   const albumElement = document.querySelector(".songinalbum_title");
   if (albumElement) {
