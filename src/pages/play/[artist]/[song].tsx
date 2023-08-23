@@ -1,9 +1,11 @@
+import Head from "next/head";
 import { useRouter } from "next/router";
 
 import GuessTheLyrics, {
   GuessTheLyricsSkeleton,
 } from "@/components/GuessTheLyrics";
 import Header from "@/components/Header";
+import SEO from "@/components/SEO";
 import { api } from "@/utils/api";
 
 export default function GamePage() {
@@ -18,15 +20,21 @@ export default function GamePage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center">
-      <Header />
-      {songData.isLoading ? (
-        <GuessTheLyricsSkeleton />
-      ) : songData.isError ? (
-        <p>Error: {songData.error.message}</p>
-      ) : songData.data && path ? (
-        <GuessTheLyrics songData={songData.data} path={path} />
-      ) : null}
-    </main>
+    <>
+      <Head>
+        <title>guess the lyrics. | {songData.data?.title ?? ""}</title>
+        <SEO />
+      </Head>
+      <main className="flex min-h-screen flex-col items-center">
+        <Header />
+        {songData.isLoading ? (
+          <GuessTheLyricsSkeleton />
+        ) : songData.isError ? (
+          <p>Error: {songData.error.message}</p>
+        ) : songData.data && path ? (
+          <GuessTheLyrics songData={songData.data} path={path} />
+        ) : null}
+      </main>
+    </>
   );
 }

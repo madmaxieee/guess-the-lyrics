@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://guess-the-lyrics.vercel.app
+
+# Sitemaps
+Sitemap: https://guess-the-lyrics.vercel.app/sitemap.xml

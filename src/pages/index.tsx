@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import Head from "next/head";
 
 import Header from "@/components/Header";
+import SEO from "@/components/SEO";
 import SearchResult, { SearchResultSkeleton } from "@/components/SearchResult";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,9 +34,8 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>guess the lyrics</title>
-        <meta name="description" content="guess the lyrics game" />
-        <link rel="icon" href="/favicon.ico" />
+        <title>guess the lyrics.</title>
+        <SEO />
       </Head>
       <main className="h-full min-h-screen flex-col items-center">
         <Header />

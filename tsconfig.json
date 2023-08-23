@@ -24,6 +24,7 @@
   "include": [
     ".eslintrc.cjs",
     "next-env.d.ts",
+    "next-sitemap.config.js",
     "**/*.ts",
     "**/*.tsx",
     "**/*.cjs",
