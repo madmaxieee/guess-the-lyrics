@@ -11,6 +11,8 @@ export const env = createEnv({
     DATABASE_HOST: z.string().min(1),
     DATABASE_USERNAME: z.string().min(1),
     DATABASE_PASSWORD: z.string().min(1),
+    UPSTASH_TOKEN: z.string().min(1),
+    UPSTASH_URL: z.string().min(1),
   },
 
   /**
@@ -31,6 +33,8 @@ export const env = createEnv({
     DATABASE_HOST: process.env.DATABASE_HOST,
     DATABASE_USERNAME: process.env.DATABASE_USERNAME,
     DATABASE_PASSWORD: process.env.DATABASE_PASSWORD,
+    UPSTASH_TOKEN: process.env.UPSTASH_TOKEN,
+    UPSTASH_URL: process.env.UPSTASH_URL,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

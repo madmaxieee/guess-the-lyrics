@@ -32,6 +32,7 @@ type CreateContextOptions = Record<string, never>;
  *
  * @see https://create.t3.gg/en/usage/trpc#-serverapitrpcts
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const createInnerTRPCContext = (_opts: CreateContextOptions) => {
   return {};
 };
@@ -43,7 +44,25 @@ const createInnerTRPCContext = (_opts: CreateContextOptions) => {
  * @see https://trpc.io/docs/context
  */
 export const createTRPCContext = (_opts: CreateNextContextOptions) => {
-  return createInnerTRPCContext({});
+  return {
+    cookies: _opts.req.cookies,
+    setCookie: (
+      key: string,
+      value: string,
+      opts: {
+        maxAge?: number;
+        path?: string;
+        httpOnly?: boolean;
+      }
+    ) => {
+      _opts.res.setHeader(
+        "Set-Cookie",
+        `${key}=${value}; Path=${opts.path ?? "/"}; ${
+          opts.httpOnly ? "HttpOnly; " : ""
+        } Max-Age=${opts.maxAge ?? -1}`
+      );
+    },
+  };
 };
 
 /**

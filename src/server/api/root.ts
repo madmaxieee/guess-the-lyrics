@@ -1,4 +1,5 @@
 import "@/db";
+import "@/db/redis";
 import { createTRPCRouter } from "@/server/api/trpc";
 
 import { lyricsRouter } from "./routers/lyrics";

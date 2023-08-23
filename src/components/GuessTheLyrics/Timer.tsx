@@ -23,8 +23,7 @@ const Timer = forwardRef(
     const intervalRef = useRef<NodeJS.Timeout>();
 
     useEffect(() => {
-      if (running) {
-        if (intervalRef.current) return;
+      if (running && !intervalRef.current) {
         intervalRef.current = setInterval(() => {
           if (time === 0) {
             onEnd?.();
@@ -34,7 +33,7 @@ const Timer = forwardRef(
             setTime((time) => time - 1);
           }
         }, 1000);
-      } else {
+      } else if (!running && intervalRef.current) {
         setTime(duration);
         clearInterval(intervalRef.current);
         intervalRef.current = undefined;

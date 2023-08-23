@@ -24,14 +24,8 @@ export default function SearchResult({ result }: SearchResultProps) {
 export function SearchResultSkeleton() {
   return (
     <div className="flex w-full justify-between gap-8 rounded-lg p-2 transition-all hover:bg-accent">
-      <Skeleton
-        className="h-6"
-        style={{ width: `${4 + Math.floor(Math.random() * 5)}em` }}
-      />
-      <Skeleton
-        className="h-6"
-        style={{ width: `${8 + Math.floor(Math.random() * 5)}em` }}
-      />
+      <Skeleton className="h-6 w-28" />
+      <Skeleton className="h-6 w-40" />
     </div>
   );
 }

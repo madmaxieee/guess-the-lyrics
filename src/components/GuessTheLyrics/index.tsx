@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Skeleton } from "../ui/skeleton";
 import { DialogDescription } from "@radix-ui/react-dialog";
@@ -7,6 +7,8 @@ import { useImmer } from "use-immer";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { api } from "@/utils/api";
+import { MIN_PLAYTIME_SECONDS } from "@/utils/constants";
 import { type RouterOutput } from "@/utils/routerTypes";
 import { cn } from "@/utils/ui";
 
@@ -14,15 +16,18 @@ import Timer from "./Timer";
 
 type GuessTheLyricsProps = {
   songData: Exclude<RouterOutput["lyrics"]["fromAZpath"], null>;
+  path: string;
 };
 
 export default function GuessTheLyrics({
   songData: { lyrics, title, artist, album, coverPhotoURL: coverPhoto },
+  path,
 }: GuessTheLyricsProps) {
   const [score, setScore] = useState(0);
   const [currentWord, setCurrentWord] = useState("");
-  const [running, setRunning] = useState(false);
-  const [gameEnded, setGameEnded] = useState(false);
+  const [gameState, setGameState] = useState<
+    "NOT_STARTED" | "RUNNING" | "PAUSED" | "ENDED"
+  >("NOT_STARTED");
   const [showWinDialog, setShowWinDialog] = useState(false);
 
   const answerArray = useMemo(() => lyrics.split(/\s+/), [lyrics]);
@@ -40,11 +45,25 @@ export default function GuessTheLyrics({
   const [isCorrect, setIsCorrect] = useImmer<boolean[]>(
     answerArray.map(() => false)
   );
-
   const [lastCorrect, setLastCorrect] = useState<Set<number>>(new Set());
 
+  const startGame = api.lyrics.start.useMutation();
+  const countPlay = api.lyrics.count.useMutation();
+  const timeoutRef = useRef<NodeJS.Timeout>();
+  useEffect(() => {
+    if (gameState === "RUNNING" && !timeoutRef.current) {
+      startGame.mutate({ path });
+      timeoutRef.current = setTimeout(() => {
+        countPlay.mutate({ path });
+      }, (MIN_PLAYTIME_SECONDS + 3) * 1000);
+    } else if (gameState === "ENDED" && timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = undefined;
+    }
+  }, [gameState, path, countPlay, startGame]);
+
   const updateCurrentWord = (word: string) => {
-    if (!running) setRunning(true);
+    if (gameState === "NOT_STARTED") setGameState("RUNNING");
 
     const key = toKey(word);
     if (answerMap[key]) {
@@ -61,7 +80,7 @@ export default function GuessTheLyrics({
       const newScore = score + correctIndices.length;
       setScore(newScore);
       if (newScore === totalWords) {
-        setGameEnded(true);
+        setGameState("ENDED");
         setShowWinDialog(true);
       }
 
@@ -93,7 +112,7 @@ export default function GuessTheLyrics({
         </div>
         <div className="flex w-full items-center gap-8 px-16">
           <Input
-            disabled={gameEnded}
+            disabled={gameState === "ENDED"}
             value={currentWord}
             onChange={(e) => updateCurrentWord(e.target.value)}
             className="grow text-xl"
@@ -103,21 +122,18 @@ export default function GuessTheLyrics({
           </p>
           <Timer
             duration={getDuration(totalWords)}
-            running={gameEnded ? false : running}
+            running={gameState === "RUNNING"}
             className="text-center font-mono text-4xl"
-            onEnd={() => {
-              setGameEnded(true);
-            }}
+            onEnd={() => setGameState("ENDED")}
           />
-          {gameEnded ? (
+          {gameState === "ENDED" ? (
             <Button
               className="whitespace-nowrap"
               variant="default"
               onClick={() => {
-                setGameEnded(false);
+                setGameState("NOT_STARTED");
                 setScore(0);
                 setCurrentWord("");
-                setRunning(false);
                 setIsCorrect(answerArray.map(() => false));
                 setLastCorrect(new Set());
               }}
@@ -128,7 +144,7 @@ export default function GuessTheLyrics({
             <Button
               className="whitespace-nowrap"
               variant="destructive"
-              onClick={() => setGameEnded(true)}
+              onClick={() => setGameState("ENDED")}
             >
               give up
             </Button>
@@ -139,14 +155,14 @@ export default function GuessTheLyrics({
             <span
               key={index}
               className={cn(
-                gameEnded && !isCorrect[index]
+                gameState === "ENDED" && !isCorrect[index]
                   ? "text-red-500"
-                  : !gameEnded && lastCorrect.has(index)
+                  : gameState !== "ENDED" && lastCorrect.has(index)
                   ? "text-green-500"
                   : null
               )}
             >
-              {gameEnded || isCorrect[index]
+              {gameState === "ENDED" || isCorrect[index]
                 ? word + " "
                 : "_".repeat(word.length) + " "}
             </span>

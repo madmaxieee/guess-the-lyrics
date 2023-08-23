@@ -8,9 +8,8 @@ import { api } from "@/utils/api";
 
 export default function GamePage() {
   const router = useRouter();
-  const path = `${router.query.artist as string}/${
-    router.query.song as string
-  }`;
+  const { artist, song } = router.query;
+  const path = artist && song ? `${artist as string}/${song as string}` : null;
   const songData = api.lyrics.fromAZpath.useQuery({ path });
   // const songData = api.mock.songData.useQuery();
 
@@ -25,8 +24,8 @@ export default function GamePage() {
         <GuessTheLyricsSkeleton />
       ) : songData.isError ? (
         <p>Error: {songData.error.message}</p>
-      ) : songData.data ? (
-        <GuessTheLyrics songData={songData.data} />
+      ) : songData.data && path ? (
+        <GuessTheLyrics songData={songData.data} path={path} />
       ) : null}
     </main>
   );
