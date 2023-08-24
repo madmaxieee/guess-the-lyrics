@@ -11,6 +11,7 @@ import { ratelimit } from "@/server/api/ratelimit";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { type SongData, fetchSongData } from "@/server/scrapers/azlyricsParser";
 import { search } from "@/server/scrapers/duckduckgo";
+import { songpath2url } from "@/utils/client";
 import {
   MIN_PLAYTIME_SECONDS,
   SESSION_EXPIRE_SECONDS,
@@ -89,15 +90,24 @@ export const lyricsRouter = createTRPCRouter({
         });
       }
 
+      let url: string;
+      try {
+        url = songpath2url(input.path);
+      } catch (e) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Invalid path",
+        });
+      }
+
       let songData: SongData | null = null;
       try {
-        const url = `https://www.azlyrics.com/lyrics/${input.path}.html`;
         songData = await fetchSongData(url);
       } catch (e) {
         console.error(e);
         throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Invalid path",
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Unable to fetch song data",
         });
       }
 

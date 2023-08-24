@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { url2path } from "@/utils/client";
+import { artisturl2key, songurl2path } from "@/utils/client";
 import { type RouterOutput } from "@/utils/routerTypes";
 
 import { Skeleton } from "./ui/skeleton";
@@ -22,7 +22,11 @@ export default function SearchResult({ result, variation }: SearchResultProps) {
 
   return (
     <Link
-      href={variation === "artists" ? `/` : `/play/${url2path(result.url)}`}
+      href={
+        variation === "artists"
+          ? `/artists/${artisturl2key(result.url)}`
+          : `/play/${songurl2path(result.url)}`
+      }
     >
       <div className="flex w-full justify-between gap-8 rounded-lg p-2 transition-all hover:bg-accent">
         <p className="grow font-bold">{title}</p>
