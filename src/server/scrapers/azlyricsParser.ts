@@ -56,7 +56,7 @@ function parseLyricsPage(html: string): Omit<SongData, "id" | "path"> {
       ?.replaceAll('"', "")
       ?.replace(/ lyrics$/, "") ?? "";
 
-  const artistElement = document.querySelector("h2>a>b");
+  const artistElement = document.querySelector("h2 b");
   const artist = artistElement?.textContent?.replace?.(/ Lyrics$/, "") ?? "";
 
   // select all div with no class
