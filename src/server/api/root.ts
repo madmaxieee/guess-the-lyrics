@@ -2,6 +2,7 @@ import "@/db";
 import "@/db/redis";
 import { createTRPCRouter } from "@/server/api/trpc";
 
+import { artistRouter } from "./routers/artists";
 import { lyricsRouter } from "./routers/lyrics";
 import { mockRouter } from "./routers/mock";
 import { testRouter } from "./routers/test";
@@ -14,6 +15,7 @@ import { testRouter } from "./routers/test";
 export const appRouter = createTRPCRouter({
   mock: mockRouter,
   lyrics: lyricsRouter,
+  artist: artistRouter,
   test: testRouter,
 });
 

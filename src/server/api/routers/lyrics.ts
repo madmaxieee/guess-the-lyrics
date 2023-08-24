@@ -3,49 +3,27 @@ import { v4 as uuid } from "uuid";
 import { z } from "zod";
 
 import { TRPCError } from "@trpc/server";
-import { Ratelimit } from "@upstash/ratelimit";
 
 import db from "@/db";
 import redis from "@/db/redis";
 import { songs } from "@/db/schema";
-import { env } from "@/env.mjs";
+import { ratelimit } from "@/server/api/ratelimit";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
-import { type SongData, fetchSongData } from "@/utils/azlyricsParser";
+import { type SongData, fetchSongData } from "@/server/scrapers/azlyricsParser";
+import { search } from "@/server/scrapers/duckduckgo";
 import {
   MIN_PLAYTIME_SECONDS,
   SESSION_EXPIRE_SECONDS,
 } from "@/utils/constants";
-import { search } from "@/utils/duckduckgo";
-
-const rateLimiter = {
-  fetch: new Ratelimit({
-    redis: redis,
-    prefix: "ratelimit:api",
-    limiter: Ratelimit.slidingWindow(10, "30 s"),
-    analytics: true,
-  }),
-  search: new Ratelimit({
-    redis: redis,
-    prefix: "ratelimit:api",
-    limiter: Ratelimit.slidingWindow(10, "10 s"),
-    analytics: true,
-  }),
-  other: new Ratelimit({
-    redis: redis,
-    prefix: "ratelimit:api",
-    limiter: Ratelimit.slidingWindow(10, "1 s"),
-    analytics: true,
-  }),
-};
 
 export const lyricsRouter = createTRPCRouter({
   search: publicProcedure
     .input(z.object({ query: z.string(), topN: z.number().max(20).default(5) }))
-    .query(async ({ input }) => {
+    .mutation(async ({ input }) => {
       if (input.query === "") return null;
 
-      const { success } = await rateLimiter.search.limit("search");
-      if (env.NODE_ENV === "production" && !success) {
+      const { success } = await ratelimit.search.limit("search");
+      if (!success) {
         throw new TRPCError({
           code: "TOO_MANY_REQUESTS",
           message: "Server is busy, try again later",
@@ -103,8 +81,8 @@ export const lyricsRouter = createTRPCRouter({
         };
       }
 
-      const { success } = await rateLimiter.fetch.limit("fetch");
-      if (env.NODE_ENV === "production" && !success) {
+      const { success } = await ratelimit.scrape.limit("scrape");
+      if (!success) {
         throw new TRPCError({
           code: "TOO_MANY_REQUESTS",
           message: "Server is busy, try again later",
@@ -146,8 +124,8 @@ export const lyricsRouter = createTRPCRouter({
   start: publicProcedure
     .input(z.object({ path: z.string().regex(/[a-z0-9]+\/[a-z0-9]+/) }))
     .mutation(async ({ input, ctx }) => {
-      const { success } = await rateLimiter.other.limit("start");
-      if (env.NODE_ENV === "production" && !success) {
+      const { success } = await ratelimit.other.limit("lyrics.start");
+      if (!success) {
         throw new TRPCError({
           code: "TOO_MANY_REQUESTS",
           message: "Server is busy, try again later",
@@ -181,8 +159,8 @@ export const lyricsRouter = createTRPCRouter({
   count: publicProcedure
     .input(z.object({ path: z.string().regex(/[a-z0-9]+\/[a-z0-9]+/) }))
     .mutation(async ({ input, ctx }) => {
-      const { success } = await rateLimiter.other.limit("count");
-      if (env.NODE_ENV === "production" && !success) {
+      const { success } = await ratelimit.other.limit("lyrics.count");
+      if (!success) {
         throw new TRPCError({
           code: "TOO_MANY_REQUESTS",
           message: "Server is busy, try again later",

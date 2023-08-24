@@ -7,12 +7,23 @@ import { Skeleton } from "./ui/skeleton";
 
 type SearchResultProps = {
   result: Exclude<RouterOutput["lyrics"]["search"], null>[number];
+  variation: "songs" | "artists";
 };
 
-export default function SearchResult({ result }: SearchResultProps) {
-  const [artist, title] = searchResult2artistTitle(result);
+export default function SearchResult({ result, variation }: SearchResultProps) {
+  let artist;
+  let title;
+  if (variation === "artists") {
+    artist = result.title;
+    title = "";
+  } else {
+    [artist, title] = searchResult2artistTitle(result);
+  }
+
   return (
-    <Link href={`/play/${url2path(result.url)}`}>
+    <Link
+      href={variation === "artists" ? `/` : `/play/${url2path(result.url)}`}
+    >
       <div className="flex w-full justify-between gap-8 rounded-lg p-2 transition-all hover:bg-accent">
         <p className="grow font-bold">{title}</p>
         <p>{artist}</p>
@@ -38,10 +49,10 @@ function searchResult2artistTitle(result: SearchResultProps["result"]) {
   }
 }
 
-function splitOnce(s: string, re: RegExp) {
+function splitOnce(s: string, re: RegExp): [string, string] {
   const match = s.match(re);
   if (!match) {
-    return [s];
+    return [s, ""];
   }
   const index = match.index ?? s.length;
   return [s.slice(0, index), s.slice(index + match[0].length)];

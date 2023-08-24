@@ -1,6 +1,6 @@
 import { JSDOM } from "jsdom";
 
-import { userAgent } from "./userAgent";
+import { fetchScrape } from "./scrapers";
 
 type DuckDuckGoResultItem = {
   title: string;
@@ -11,11 +11,8 @@ type DuckDuckGoResultItem = {
 export async function search(query: string) {
   const cleanedQuery = query.trim().replaceAll(/\s/g, "+");
   const url = `https://lite.duckduckgo.com/lite/?q=${cleanedQuery}`;
-  const response = await fetch(url, {
-    headers: { "User-Agent": userAgent() },
-  });
-  const text = await response.text();
-  return new DuckDuckGoResult(url, text);
+  const html = await fetchScrape(url);
+  return new DuckDuckGoResult(url, html);
 }
 
 class DuckDuckGoResult {
@@ -60,6 +57,7 @@ class DuckDuckGoResult {
     const document = new JSDOM(this._html).window.document;
 
     const tables = document.querySelectorAll("table");
+    console.log(this._html);
     // find the longest table
     const resultsTable = Array.from(tables).reduce((prev, curr) => {
       if (curr.rows.length > prev.rows.length) {
