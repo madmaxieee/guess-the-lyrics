@@ -57,7 +57,7 @@ class DuckDuckGoResult {
     const document = new JSDOM(this._html).window.document;
 
     const tables = document.querySelectorAll("table");
-    console.log(this._html);
+
     // find the longest table
     const resultsTable = Array.from(tables).reduce((prev, curr) => {
       if (curr.rows.length > prev.rows.length) {

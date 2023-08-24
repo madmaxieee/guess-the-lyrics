@@ -8,6 +8,7 @@
     "lint": "next lint",
     "start": "next start",
     "postbuild": "next-sitemap",
+    "generate": "drizzle-kit generate:mysql --schema=./src/db/schema.ts",
     "migrate": "node ./scripts/migrate.mjs"
   },
   "dependencies": {
