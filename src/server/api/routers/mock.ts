@@ -1,7 +1,10 @@
 import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
-import { ArtistData, type SongData } from "@/server/scrapers/azlyricsParser";
+import {
+  type ArtistData,
+  type SongData,
+} from "@/server/scrapers/azlyricsParser";
 
 const mockData: SongData = {
   path: "taylorswift/lovestory",

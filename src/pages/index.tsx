@@ -110,7 +110,7 @@ export default function Home() {
               {Array.from(Array(RESULT_LIMIT), (_, index) => (
                 <li key={index}>
                   <SearchResultSkeleton />
-                  <Separator className="mt-3" />
+                  <Separator className="mt-3 max-md:mt-1.5" />
                 </li>
               ))}
             </ul>
@@ -123,7 +123,7 @@ export default function Home() {
               {searchMutation.data.map((result) => (
                 <li key={result.url}>
                   <SearchResult variation={searchMode} result={result} />
-                  <Separator className="mt-3" />
+                  <Separator className="mt-3 max-md:mt-1.5" />
                 </li>
               ))}
             </ul>

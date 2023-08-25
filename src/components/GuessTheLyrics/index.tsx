@@ -127,7 +127,7 @@ export default function GuessTheLyrics({
             </div>
           </div>
         )}
-        <div className="flex w-full items-center gap-8 px-16 max-md:flex-col max-md:gap-4">
+        <div className="flex w-full items-center gap-8 px-16 max-md:flex-col max-md:gap-4 max-md:px-4">
           <Input
             disabled={gameState === "ENDED"}
             value={currentWord}
@@ -173,7 +173,7 @@ export default function GuessTheLyrics({
             disabled={gameState === "ENDED"}
             value={currentWord}
             onChange={(e) => updateCurrentWord(e.target.value)}
-            className="hidden grow text-xl max-md:block"
+            className="hidden grow text-xl max-md:block max-md:w-4/5"
           />
         </div>
         <p className="font-mono text-xl text-gray-500 max-md:mx-2">
@@ -209,22 +209,25 @@ export default function GuessTheLyrics({
 
 export function GuessTheLyricsSkeleton() {
   return (
-    <div className="mx-10vw container flex max-w-5xl flex-col items-center justify-center gap-6 px-4 py-12">
-      <div className="flex justify-between gap-12">
-        <Skeleton className="h-56 w-56 rounded-xl" />
-        <div className="flex max-w-5xl flex-col justify-center gap-4">
-          <Skeleton className="my-6 h-16 w-96" />
-          <Skeleton className="h-8 w-48" />
-          <Skeleton className="h-8 w-32" />
+    <div className="mx-10vw container flex max-w-5xl flex-col items-center justify-center gap-6 px-4 py-12 max-md:gap-4 max-md:py-6">
+      <div className="flex justify-between gap-12 max-md:mx-1 max-md:gap-6">
+        <Skeleton className="h-56 w-56 rounded-xl max-md:h-40 max-md:w-40 max-md:rounded-md" />
+        <div className="flex max-w-5xl flex-col justify-center gap-4 max-md:gap-2">
+          <Skeleton className="my-6 h-16 w-96 max-md:my-0 max-md:h-10 max-md:w-40" />
+          <Skeleton className="h-8 w-48 max-md:h-8 max-md:w-32" />
+          <Skeleton className="h-8 w-32 max-md:h-6 max-md:w-28" />
         </div>
       </div>
-      <div className="flex w-full items-center gap-8 px-16">
-        <Input className="grow text-xl" disabled />
-        <Skeleton className="h-10 w-56" />
-        <Skeleton className="h-10 w-56" />
-        <Button className="whitespace-nowrap" variant="destructive" disabled>
-          give up
-        </Button>
+      <div className="flex w-full items-center gap-8 px-16 max-md:flex-col max-md:gap-4 max-md:px-4">
+        <Input className="hidden grow text-xl md:block" disabled />
+        <div className="flex gap-8 max-md:w-full max-md:justify-center max-md:gap-6">
+          <Skeleton className="h-10 w-32" />
+          <Skeleton className="h-10 w-32" />
+          <Button className="whitespace-nowrap" variant="destructive" disabled>
+            give up
+          </Button>
+        </div>
+        <Input className="hidden text-xl max-md:block max-md:w-4/5" disabled />
       </div>
       <div className="flex w-full flex-col gap-4">
         {Array.from(Array(15), (_, index) => (
