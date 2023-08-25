@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import { Shuffle } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 import { type ArtistData } from "@/server/scrapers/azlyricsParser";
 import { api } from "@/utils/api";
@@ -17,6 +18,15 @@ type AlbumDisplayProps = {
 
 export default function AlbumDisplay({ album, artistKey }: AlbumDisplayProps) {
   const createRandomGame = api.game.createRandom.useMutation();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (createRandomGame.isSuccess) {
+      router
+        .push(`/play/random/${createRandomGame.data.randomGameID}`)
+        .catch(console.error);
+    }
+  }, [createRandomGame.data?.randomGameID, createRandomGame.isSuccess, router]);
 
   return (
     <>

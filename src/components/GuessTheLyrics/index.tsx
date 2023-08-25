@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Skeleton } from "../ui/skeleton";
 import { DialogDescription } from "@radix-ui/react-dialog";
+import { Eye, EyeOff } from "lucide-react";
 import { useImmer } from "use-immer";
 
 import { Button } from "@/components/ui/button";
@@ -21,9 +22,9 @@ type GuessTheLyricsProps = {
 };
 
 export default function GuessTheLyrics({
-  songData: { lyrics, title, artist, album, coverPhotoURL: coverPhoto },
+  songData: { lyrics, title, artist, album, coverPhotoURL },
   path,
-  hideInfo,
+  hideInfo: initialHideInfo,
 }: GuessTheLyricsProps) {
   const [score, setScore] = useState(0);
   const [currentWord, setCurrentWord] = useState("");
@@ -31,6 +32,7 @@ export default function GuessTheLyrics({
     "NOT_STARTED" | "RUNNING" | "PAUSED" | "ENDED"
   >("NOT_STARTED");
   const [showWinDialog, setShowWinDialog] = useState(false);
+  const [hideInfo, setHideInfo] = useState(initialHideInfo ?? false);
 
   const answerArray = useMemo(() => lyrics.split(/\s+/), [lyrics]);
   const totalWords = useMemo(() => answerArray.length, [answerArray]);
@@ -96,37 +98,50 @@ export default function GuessTheLyrics({
 
   return (
     <>
-      <div className="mx-10vw container flex max-w-5xl flex-col items-center justify-center gap-6 px-4 py-12 max-md:gap-4 max-md:py-6">
-        {hideInfo && gameState !== "ENDED" ? (
-          <div className="flex justify-between gap-12 max-md:mx-1 max-md:gap-6">
-            <div className="h-56 w-56 rounded-xl bg-muted max-md:h-40 max-md:w-40 max-md:rounded-md" />
-            <div className="flex max-w-5xl flex-col justify-center gap-4 max-md:gap-2">
-              <div className="my-6 h-16 w-96 rounded-md bg-muted max-md:my-0 max-md:h-10 max-md:w-40" />
-              <div className="h-8 w-48 rounded-md bg-muted max-md:h-8 max-md:w-32" />
-              <div className="h-8 w-32 rounded-md bg-muted max-md:h-6 max-md:w-28" />
-            </div>
-          </div>
-        ) : (
-          <div className="flex justify-between gap-12 max-md:mx-1 max-md:gap-6">
-            {coverPhoto && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={coverPhoto}
-                alt="Album cover"
-                className="h-56 w-56 rounded-xl max-md:h-40 max-md:w-40 max-md:rounded-md"
-              />
-            )}
-            <div className="flex max-w-5xl flex-col justify-center gap-4 max-md:gap-2">
-              <h1 className="my-6 text-6xl font-extrabold max-md:my-0 max-md:text-3xl">
-                {title}
-              </h1>
-              <h2 className="text-4xl font-extrabold max-md:text-2xl">
-                {artist}
-              </h2>
-              <p className="text-3xl max-md:text-xl">{album}</p>
-            </div>
-          </div>
+      <div className="mx-10vw container relative flex max-w-5xl flex-col items-center justify-center gap-6 px-4 py-12 max-md:gap-4 max-md:py-6">
+        {initialHideInfo && (
+          <Button
+            size="icon"
+            variant="outline"
+            className="absolute left-8 top-8"
+            onClick={() => setHideInfo(!hideInfo)}
+          >
+            {hideInfo ? <Eye size="1.25em" /> : <EyeOff size="1.25em" />}
+          </Button>
         )}
+        <div className="flex justify-between gap-12 max-md:mx-1 max-md:gap-6">
+          {hideInfo && gameState !== "ENDED" ? (
+            <>
+              <div className="h-56 w-56 rounded-xl bg-muted max-md:h-40 max-md:w-40 max-md:rounded-md" />
+              <div className="flex max-w-5xl flex-col justify-center gap-4 max-md:gap-2">
+                <div className="my-6 h-16 w-96 rounded-md bg-muted max-md:my-0 max-md:h-10 max-md:w-40" />
+                <div className="h-8 w-48 rounded-md bg-muted max-md:h-8 max-md:w-32" />
+                <div className="h-8 w-32 rounded-md bg-muted max-md:h-6 max-md:w-28" />
+              </div>
+            </>
+          ) : (
+            <>
+              {coverPhotoURL && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={coverPhotoURL}
+                  alt="Album cover"
+                  className="h-56 w-56 rounded-xl max-md:h-40 max-md:w-40 max-md:rounded-md"
+                />
+              )}
+              <div className="flex max-w-5xl flex-col justify-center gap-4 max-md:gap-2">
+                <h1 className="my-6 text-6xl font-extrabold max-md:my-0 max-md:text-3xl">
+                  {title}
+                </h1>
+                <h2 className="text-4xl font-extrabold max-md:text-2xl">
+                  {artist}
+                </h2>
+                <p className="text-3xl max-md:text-xl">{album}</p>
+              </div>
+            </>
+          )}
+        </div>
+
         <div className="flex w-full items-center gap-8 px-16 max-md:flex-col max-md:gap-4 max-md:px-4">
           <Input
             disabled={gameState === "ENDED"}
@@ -176,6 +191,7 @@ export default function GuessTheLyrics({
             className="hidden grow text-xl max-md:block max-md:w-4/5"
           />
         </div>
+
         <p className="font-mono text-xl text-gray-500 max-md:mx-2">
           {answerArray.map((word, index) => (
             <span
