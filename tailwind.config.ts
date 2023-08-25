@@ -1,4 +1,5 @@
 import { type Config } from "tailwindcss";
+import { fontFamily } from "tailwindcss/defaultTheme";
 
 export default {
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
@@ -12,6 +13,9 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        mono: ["var(--font-roboto-mono)", ...fontFamily.mono],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
