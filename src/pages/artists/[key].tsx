@@ -47,6 +47,7 @@ export default function ArtistPage() {
                   onClick={() =>
                     createRandomGame.mutate({ artistKey: artistKey })
                   }
+                  disabled={createRandomGame.isLoading}
                 >
                   <Shuffle className="mr-2" size="1.25em" /> Random
                 </Button>
@@ -71,6 +72,7 @@ export default function ArtistPage() {
                         <Button
                           size="icon"
                           variant="secondary"
+                          disabled={createRandomGame.isLoading}
                           onClick={() =>
                             createRandomGame.mutate({
                               artistKey,

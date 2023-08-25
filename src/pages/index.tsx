@@ -31,6 +31,9 @@ export default function Home() {
   const searchBoxRef = useRef<HTMLInputElement>(null);
 
   const search = () => {
+    if (searchMutation.isLoading) {
+      return;
+    }
     const query = searchBoxRef.current?.value;
     if (query) {
       searchMutation.mutate({ query, topN: RESULT_LIMIT });
@@ -93,7 +96,14 @@ export default function Home() {
               </DropdownMenuContent>
             </DropdownMenu>
             <Input className="w-72" ref={searchBoxRef} onKeyUp={onEnter} />
-            <Button onClick={search}>search</Button>
+            <Button
+              disabled={
+                searchMutation.isLoading || searchBoxRef.current?.value === ""
+              }
+              onClick={search}
+            >
+              search
+            </Button>
           </div>
           {searchMutation.isLoading ? (
             <ul className="mx-auto flex max-w-2xl flex-col gap-3">
