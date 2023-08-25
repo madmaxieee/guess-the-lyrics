@@ -3,6 +3,7 @@ import "@/db/redis";
 import { createTRPCRouter } from "@/server/api/trpc";
 
 import { artistRouter } from "./routers/artists";
+import { gameRouter } from "./routers/game";
 import { lyricsRouter } from "./routers/lyrics";
 import { mockRouter } from "./routers/mock";
 import { testRouter } from "./routers/test";
@@ -16,6 +17,7 @@ export const appRouter = createTRPCRouter({
   mock: mockRouter,
   lyrics: lyricsRouter,
   artist: artistRouter,
+  game: gameRouter,
   test: testRouter,
 });
 

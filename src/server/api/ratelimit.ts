@@ -6,13 +6,13 @@ export const ratelimit = {
   scrape: new Ratelimit({
     redis: redis,
     prefix: "ratelimit:api",
-    limiter: Ratelimit.slidingWindow(10, "30 s"),
+    limiter: Ratelimit.slidingWindow(5, "15 s"),
     analytics: true,
   }),
   search: new Ratelimit({
     redis: redis,
     prefix: "ratelimit:api",
-    limiter: Ratelimit.slidingWindow(10, "30 s"),
+    limiter: Ratelimit.slidingWindow(5, "15 s"),
     analytics: true,
   }),
   other: new Ratelimit({

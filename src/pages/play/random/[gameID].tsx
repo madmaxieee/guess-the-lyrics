@@ -10,10 +10,11 @@ import { api } from "@/utils/api";
 
 export default function GamePage() {
   const router = useRouter();
-  const { artist, song } = router.query;
-  const path = artist && song ? `${artist as string}/${song as string}` : null;
-  const songData = api.lyrics.fromAZpath.useQuery({ path });
+  const { gameID } = router.query;
   // const songData = api.mock.songData.useQuery();
+  const songData = api.game.getRandom.useQuery({
+    randomGameID: gameID as string,
+  });
 
   return (
     <>
@@ -30,8 +31,12 @@ export default function GamePage() {
             <h1 className="text-4xl font-bold">Error</h1>
             <p className="text-xl">{songData.error?.message}</p>
           </div>
-        ) : songData.data && path ? (
-          <GuessTheLyrics songData={songData.data} path={path} />
+        ) : songData.data ? (
+          <GuessTheLyrics
+            songData={songData.data}
+            path={songData.data.path}
+            hideInfo
+          />
         ) : null}
       </main>
     </>

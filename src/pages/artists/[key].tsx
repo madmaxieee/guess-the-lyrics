@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import { Shuffle } from "lucide-react";
 import Head from "next/head";
@@ -18,15 +18,15 @@ export default function ArtistPage() {
   const artistData = api.artist.fromAZkey.useQuery({ key: artistKey });
   // const artistData = api.mock.artistData.useQuery();
 
-  const randomSong = () => {
-    if (!artistData.data) return;
-    const allSongs = artistData.data.albums.flatMap((album) => album.songs);
-    if (artistData.data.otherSongs) {
-      allSongs.push(...artistData.data.otherSongs);
+  const createRandomGame = api.game.createRandom.useMutation();
+
+  useEffect(() => {
+    if (createRandomGame.isSuccess) {
+      router
+        .push(`/play/random/${createRandomGame.data.randomGameID}`)
+        .catch(console.error);
     }
-    const randomSong = randomSelect(allSongs);
-    router.push(`/play/${randomSong.path}`).catch(console.error);
-  };
+  }, [createRandomGame.data?.randomGameID, createRandomGame.isSuccess, router]);
 
   return (
     <>
@@ -43,7 +43,11 @@ export default function ArtistPage() {
                 <h1 className="mb-16 text-4xl font-bold">
                   {artistData.data.name}
                 </h1>
-                <Button onClick={randomSong}>
+                <Button
+                  onClick={() =>
+                    createRandomGame.mutate({ artistKey: artistKey })
+                  }
+                >
                   <Shuffle className="mr-2" size="1.25em" /> Random
                 </Button>
               </div>
@@ -67,12 +71,12 @@ export default function ArtistPage() {
                         <Button
                           size="icon"
                           variant="secondary"
-                          onClick={() => {
-                            const randomSong = randomSelect(album.songs);
-                            router
-                              .push(`/play/${randomSong.path}`)
-                              .catch(console.error);
-                          }}
+                          onClick={() =>
+                            createRandomGame.mutate({
+                              artistKey,
+                              album: album.name,
+                            })
+                          }
                         >
                           <Shuffle size="1.25em" />
                         </Button>
@@ -94,20 +98,6 @@ export default function ArtistPage() {
                           <h2 className="text-2xl font-bold">other songs:</h2>
                         </div>
                         <div className="col-span-3 flex gap-3">
-                          <Button
-                            size="icon"
-                            variant="secondary"
-                            onClick={() => {
-                              const randomSong = randomSelect(
-                                artistData.data.otherSongs!
-                              );
-                              router
-                                .push(`/play/${randomSong.path}`)
-                                .catch(console.error);
-                            }}
-                          >
-                            <Shuffle size="1.25em" />
-                          </Button>
                           <ul>
                             {artistData.data.otherSongs.map((song) => (
                               <AlbumSong song={song} key={song.title} />
@@ -138,8 +128,4 @@ function AlbumSong({
       </li>
     </Link>
   );
-}
-
-function randomSelect<T>(arr: T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)]!;
 }

@@ -17,11 +17,13 @@ import Timer from "./Timer";
 type GuessTheLyricsProps = {
   songData: Exclude<RouterOutput["lyrics"]["fromAZpath"], null>;
   path: string;
+  hideInfo?: boolean;
 };
 
 export default function GuessTheLyrics({
   songData: { lyrics, title, artist, album, coverPhotoURL: coverPhoto },
   path,
+  hideInfo,
 }: GuessTheLyricsProps) {
   const [score, setScore] = useState(0);
   const [currentWord, setCurrentWord] = useState("");
@@ -47,8 +49,8 @@ export default function GuessTheLyrics({
   );
   const [lastCorrect, setLastCorrect] = useState<Set<number>>(new Set());
 
-  const startGame = api.lyrics.start.useMutation();
-  const countPlay = api.lyrics.count.useMutation();
+  const startGame = api.game.start.useMutation();
+  const countPlay = api.game.count.useMutation();
   const timeoutRef = useRef<NodeJS.Timeout>();
   useEffect(() => {
     if (gameState === "RUNNING" && !timeoutRef.current) {
@@ -95,21 +97,32 @@ export default function GuessTheLyrics({
   return (
     <>
       <div className="mx-10vw container flex max-w-5xl flex-col items-center justify-center gap-6 px-4 py-12">
-        <div className="flex justify-between gap-12">
-          {coverPhoto && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={coverPhoto}
-              alt="Album cover"
-              className="h-56 w-56 rounded-xl"
-            />
-          )}
-          <div className="flex max-w-5xl flex-col justify-center gap-4">
-            <h1 className="my-6 text-6xl font-extrabold">{title}</h1>
-            <h2 className="text-4xl font-extrabold">{artist}</h2>
-            <p className="text-3xl">{album}</p>
+        {hideInfo && gameState !== "ENDED" ? (
+          <div className="flex justify-between gap-12">
+            <div className="h-56 w-56 rounded-xl bg-muted" />
+            <div className="flex max-w-5xl flex-col justify-center gap-4">
+              <div className="my-6 h-16 w-96 rounded-md bg-muted" />
+              <div className="h-8 w-48 rounded-md bg-muted" />
+              <div className="h-8 w-32 rounded-md bg-muted" />
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex justify-between gap-12">
+            {coverPhoto && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={coverPhoto}
+                alt="Album cover"
+                className="h-56 w-56 rounded-xl"
+              />
+            )}
+            <div className="flex max-w-5xl flex-col justify-center gap-4">
+              <h1 className="my-6 text-6xl font-extrabold">{title}</h1>
+              <h2 className="text-4xl font-extrabold">{artist}</h2>
+              <p className="text-3xl">{album}</p>
+            </div>
+          </div>
+        )}
         <div className="flex w-full items-center gap-8 px-16">
           <Input
             disabled={gameState === "ENDED"}
@@ -185,7 +198,6 @@ export function GuessTheLyricsSkeleton() {
   return (
     <div className="mx-10vw container flex max-w-5xl flex-col items-center justify-center gap-6 px-4 py-12">
       <div className="flex justify-between gap-12">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <Skeleton className="h-56 w-56 rounded-xl" />
         <div className="flex max-w-5xl flex-col justify-center gap-4">
           <Skeleton className="my-6 h-16 w-96" />

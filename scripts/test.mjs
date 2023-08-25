@@ -72,12 +72,12 @@ const db = drizzle(connection);
 
 const statement2 = db
   .select({
-    title: songs.title,
-    key: artists.key,
+    path: songs.path,
   })
-  .from(artists)
-  .innerJoin(songs, eq(songs.artistKey, artists.key))
-  .where(and(eq(artists.key, "artist"), eq(songs.title, "test")))
+  .from(songs)
+  .where(and(eq(songs.artist, "testartist"), eq(songs.album, "testalbum")))
+  .orderBy(sql`RAND()`)
+  .limit(1)
   .toSQL();
 
-console.log({ test: statement2 });
+console.log(statement2);
