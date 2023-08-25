@@ -12,8 +12,8 @@ export default function GamePage() {
   const router = useRouter();
   const { artist, song } = router.query;
   const path = artist && song ? `${artist as string}/${song as string}` : null;
-  // const songData = api.lyrics.fromAZpath.useQuery({ path });
-  const songData = api.mock.songData.useQuery();
+  const songData = api.lyrics.fromAZpath.useQuery({ path });
+  // const songData = api.mock.songData.useQuery();
 
   return (
     <>

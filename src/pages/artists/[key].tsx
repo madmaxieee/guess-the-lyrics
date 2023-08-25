@@ -15,8 +15,8 @@ import { api } from "@/utils/api";
 export default function ArtistPage() {
   const router = useRouter();
   const artistKey = router.query.key as string;
-  // const artistData = api.artist.fromAZkey.useQuery({ key: artistKey });
-  const artistData = api.mock.artistData.useQuery();
+  const artistData = api.artist.fromAZkey.useQuery({ key: artistKey });
+  // const artistData = api.mock.artistData.useQuery();
 
   const createRandomGame = api.game.createRandom.useMutation();
 
