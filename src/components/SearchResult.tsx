@@ -28,7 +28,7 @@ export default function SearchResult({ result, variation }: SearchResultProps) {
           : `/play/${songurl2path(result.url)}`
       }
     >
-      <div className="flex w-full justify-between gap-8 rounded-lg p-2 transition-all hover:bg-accent">
+      <div className="flex w-full justify-between rounded-lg p-2 transition-all hover:bg-accent max-md:text-sm">
         <p className="grow font-bold">{title}</p>
         <p>{artist}</p>
       </div>
@@ -39,8 +39,8 @@ export default function SearchResult({ result, variation }: SearchResultProps) {
 export function SearchResultSkeleton() {
   return (
     <div className="flex w-full justify-between gap-8 rounded-lg p-2 transition-all hover:bg-accent">
-      <Skeleton className="h-6 w-28" />
-      <Skeleton className="h-6 w-40" />
+      <Skeleton className="h-6 w-28 max-md:h-4" />
+      <Skeleton className="h-6 w-40 max-md:h-4" />
     </div>
   );
 }

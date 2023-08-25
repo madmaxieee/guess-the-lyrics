@@ -96,74 +96,87 @@ export default function GuessTheLyrics({
 
   return (
     <>
-      <div className="mx-10vw container flex max-w-5xl flex-col items-center justify-center gap-6 px-4 py-12">
+      <div className="mx-10vw container flex max-w-5xl flex-col items-center justify-center gap-6 px-4 py-12 max-md:gap-4 max-md:py-6">
         {hideInfo && gameState !== "ENDED" ? (
-          <div className="flex justify-between gap-12">
-            <div className="h-56 w-56 rounded-xl bg-muted" />
-            <div className="flex max-w-5xl flex-col justify-center gap-4">
-              <div className="my-6 h-16 w-96 rounded-md bg-muted" />
-              <div className="h-8 w-48 rounded-md bg-muted" />
-              <div className="h-8 w-32 rounded-md bg-muted" />
+          <div className="flex justify-between gap-12 max-md:mx-1 max-md:gap-6">
+            <div className="h-56 w-56 rounded-xl bg-muted max-md:h-40 max-md:w-40 max-md:rounded-md" />
+            <div className="flex max-w-5xl flex-col justify-center gap-4 max-md:gap-2">
+              <div className="my-6 h-16 w-96 rounded-md bg-muted max-md:my-0 max-md:h-10 max-md:w-40" />
+              <div className="h-8 w-48 rounded-md bg-muted max-md:h-8 max-md:w-32" />
+              <div className="h-8 w-32 rounded-md bg-muted max-md:h-6 max-md:w-28" />
             </div>
           </div>
         ) : (
-          <div className="flex justify-between gap-12">
+          <div className="flex justify-between gap-12 max-md:mx-1 max-md:gap-6">
             {coverPhoto && (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={coverPhoto}
                 alt="Album cover"
-                className="h-56 w-56 rounded-xl"
+                className="h-56 w-56 rounded-xl max-md:h-40 max-md:w-40 max-md:rounded-md"
               />
             )}
-            <div className="flex max-w-5xl flex-col justify-center gap-4">
-              <h1 className="my-6 text-6xl font-extrabold">{title}</h1>
-              <h2 className="text-4xl font-extrabold">{artist}</h2>
-              <p className="text-3xl">{album}</p>
+            <div className="flex max-w-5xl flex-col justify-center gap-4 max-md:gap-2">
+              <h1 className="my-6 text-6xl font-extrabold max-md:my-0 max-md:text-3xl">
+                {title}
+              </h1>
+              <h2 className="text-4xl font-extrabold max-md:text-2xl">
+                {artist}
+              </h2>
+              <p className="text-3xl max-md:text-xl">{album}</p>
             </div>
           </div>
         )}
-        <div className="flex w-full items-center gap-8 px-16">
+        <div className="flex w-full items-center gap-8 px-16 max-md:flex-col max-md:gap-4">
           <Input
             disabled={gameState === "ENDED"}
             value={currentWord}
             onChange={(e) => updateCurrentWord(e.target.value)}
-            className="grow text-xl"
+            className="hidden grow text-xl md:block"
           />
-          <p className="w-64 text-right text-4xl font-bold">
-            {score}/{totalWords}
-          </p>
-          <Timer
-            duration={getDuration(totalWords)}
-            running={gameState === "RUNNING"}
-            className="text-center font-mono text-4xl"
-            onEnd={() => setGameState("ENDED")}
+          <div className="flex gap-8 max-md:w-full max-md:justify-center max-md:gap-6">
+            <p className="w-32 text-right text-4xl font-bold max-md:text-3xl">
+              {score}/{totalWords}
+            </p>
+            <Timer
+              duration={getDuration(totalWords)}
+              running={gameState === "RUNNING"}
+              className="text-center font-mono text-4xl max-md:text-3xl"
+              onEnd={() => setGameState("ENDED")}
+            />
+            {gameState === "ENDED" ? (
+              <Button
+                className="whitespace-nowrap"
+                variant="default"
+                size="sm"
+                onClick={() => {
+                  setGameState("NOT_STARTED");
+                  setScore(0);
+                  setCurrentWord("");
+                  setIsCorrect(answerArray.map(() => false));
+                  setLastCorrect(new Set());
+                }}
+              >
+                restart
+              </Button>
+            ) : (
+              <Button
+                className="whitespace-nowrap"
+                variant="destructive"
+                onClick={() => setGameState("ENDED")}
+              >
+                give up
+              </Button>
+            )}
+          </div>
+          <Input
+            disabled={gameState === "ENDED"}
+            value={currentWord}
+            onChange={(e) => updateCurrentWord(e.target.value)}
+            className="hidden grow text-xl max-md:block"
           />
-          {gameState === "ENDED" ? (
-            <Button
-              className="whitespace-nowrap"
-              variant="default"
-              onClick={() => {
-                setGameState("NOT_STARTED");
-                setScore(0);
-                setCurrentWord("");
-                setIsCorrect(answerArray.map(() => false));
-                setLastCorrect(new Set());
-              }}
-            >
-              restart
-            </Button>
-          ) : (
-            <Button
-              className="whitespace-nowrap"
-              variant="destructive"
-              onClick={() => setGameState("ENDED")}
-            >
-              give up
-            </Button>
-          )}
         </div>
-        <p className="font-mono text-xl text-gray-500">
+        <p className="font-mono text-xl text-gray-500 max-md:mx-2">
           {answerArray.map((word, index) => (
             <span
               key={index}

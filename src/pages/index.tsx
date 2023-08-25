@@ -75,11 +75,11 @@ export default function Home() {
           priority
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           src={banner}
-          className="mx-auto mt-8 max-w-4xl"
+          className="mx-auto mt-8 max-w-4xl max-sm:w-full"
           alt="Are you a real fan? guess the lyrics!"
         />
-        <div className="mx-auto mt-8 max-w-4xl text-xl">
-          <div className="my-6 flex justify-center gap-4">
+        <div className="mx-auto my-8 max-w-4xl text-xl max-md:px-6">
+          <div className="mx-8 my-6 flex justify-center gap-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="w-16">
@@ -119,7 +119,7 @@ export default function Home() {
           ) : searchMutation.data?.length === 0 ? (
             <p>No results</p>
           ) : searchMutation.data ? (
-            <ul className="mx-auto flex max-w-2xl flex-col gap-3">
+            <ul className="mx-auto flex max-w-2xl flex-col gap-3 max-md:gap-2">
               {searchMutation.data.map((result) => (
                 <li key={result.url}>
                   <SearchResult variation={searchMode} result={result} />

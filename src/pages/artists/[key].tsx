@@ -15,8 +15,8 @@ import { api } from "@/utils/api";
 export default function ArtistPage() {
   const router = useRouter();
   const artistKey = router.query.key as string;
-  const artistData = api.artist.fromAZkey.useQuery({ key: artistKey });
-  // const artistData = api.mock.artistData.useQuery();
+  // const artistData = api.artist.fromAZkey.useQuery({ key: artistKey });
+  const artistData = api.mock.artistData.useQuery();
 
   const createRandomGame = api.game.createRandom.useMutation();
 
@@ -36,41 +36,59 @@ export default function ArtistPage() {
       </Head>
       <main className="flex min-h-screen flex-col items-center">
         <Header />
-        <div className="mx-auto mb-16 mt-8 max-w-4xl text-xl">
+        <div className="mx-auto mb-16 mt-8 max-w-4xl text-xl max-md:mx-1">
           {artistData.data ? (
             <>
-              <div className="flex justify-between">
-                <h1 className="mb-16 text-4xl font-bold">
+              <div className="mb-16 flex justify-between max-md:mb-8 max-md:px-4">
+                <h1 className="text-4xl font-bold max-md:text-3xl">
                   {artistData.data.name}
                 </h1>
                 <Button
                   onClick={() =>
                     createRandomGame.mutate({ artistKey: artistKey })
                   }
+                  size="sm"
                   disabled={createRandomGame.isLoading}
                 >
                   <Shuffle className="mr-2" size="1.25em" /> Random
                 </Button>
               </div>
-              <div className="flex flex-col gap-8">
+              <div className="flex flex-col gap-8 max-md:gap-4 max-md:px-2">
                 {artistData.data.albums.map((album) => (
                   <React.Fragment key={album.name}>
                     <Separator />
                     <div key={album.name} className="grid grid-cols-5">
-                      <div className="col-span-2 flex flex-col items-center gap-6">
+                      <div className="col-span-2 flex flex-col items-center gap-6 max-md:ml-1.5 max-md:items-start max-md:gap-3">
                         {album.coverPhotoURL && (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
                             src={album.coverPhotoURL}
                             alt={album.name}
-                            className="h-48 w-48 rounded-lg"
+                            className="h-48 w-48 rounded-lg max-md:h-32 max-md:w-32 max-md:rounded-md"
                           />
                         )}
-                        <h2 className="text-2xl font-bold">{album.name}</h2>
+                        <h2 className="text-2xl font-bold max-md:text-xl">
+                          {album.name}
+                        </h2>
+                        <Button
+                          size="icon"
+                          className="hidden max-md:inline-flex"
+                          variant="secondary"
+                          disabled={createRandomGame.isLoading}
+                          onClick={() =>
+                            createRandomGame.mutate({
+                              artistKey,
+                              album: album.name,
+                            })
+                          }
+                        >
+                          <Shuffle size="1.25em" />
+                        </Button>
                       </div>
                       <div className="col-span-3 flex gap-3">
                         <Button
                           size="icon"
+                          className="hidden md:inline-flex"
                           variant="secondary"
                           disabled={createRandomGame.isLoading}
                           onClick={() =>
@@ -125,7 +143,7 @@ function AlbumSong({
 }) {
   return (
     <Link href={`/play/${path}`} key={title}>
-      <li className="mb-1 rounded-lg px-3 py-1.5 transition-all hover:translate-x-2 hover:bg-accent hover:font-bold">
+      <li className="mb-1 rounded-lg px-3 py-1.5 transition-all hover:translate-x-2 hover:bg-accent hover:font-bold max-md:py-1 max-md:text-sm max-md:underline">
         {title}
       </li>
     </Link>
