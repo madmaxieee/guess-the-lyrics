@@ -1,10 +1,12 @@
-import { customType } from "drizzle-orm/mysql-core";
+import { sql } from "drizzle-orm";
 import {
+  customType,
   serial,
   mysqlTable,
   varchar,
   mediumint,
   index,
+  timestamp,
 } from "drizzle-orm/mysql-core";
 
 const artist_key = customType<{ data: string }>({
@@ -26,14 +28,24 @@ export const songs = mysqlTable(
     timesPlayed: mediumint("times_played").default(0),
     artistKey: artist_key("artist_key"),
   },
-  (table) => {
-    return {
-      path_index: index("path_index").on(table.path),
-      timesPlayed_index: index("times_played_index").on(table.timesPlayed),
-      artistKey_index: index("artist_key_index").on(table.artistKey),
-    };
-  }
+  (table) => ({
+    path_index: index("path_index").on(table.path),
+    timesPlayed_index: index("times_played_index").on(table.timesPlayed),
+    artistKey_index: index("artist_key_index").on(table.artistKey),
+  })
 );
 
 export type Song = typeof songs.$inferSelect;
 export type NewSong = typeof songs.$inferInsert;
+
+export const artists = mysqlTable(
+  "artists",
+  {
+    id: serial("id").primaryKey(),
+    key: varchar("key", { length: 128 }).unique().notNull(),
+    lastSongListUpdate: timestamp("last_song_list_update"),
+  },
+  (table) => ({
+    key_index: index("key_index").on(table.key),
+  })
+);

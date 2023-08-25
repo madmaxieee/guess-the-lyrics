@@ -61,6 +61,7 @@ export const lyricsRouter = createTRPCRouter({
     )
     .query(async ({ input }) => {
       if (!input.path) return null;
+
       const [dbSongData] = await db
         .select({
           title: songs.title,
@@ -72,13 +73,13 @@ export const lyricsRouter = createTRPCRouter({
         .from(songs)
         .where(eq(songs.path, input.path))
         .execute();
-      if (dbSongData) {
+      if (dbSongData?.lyrics) {
         return {
           title: dbSongData.title,
           artist: dbSongData.artist,
           album: dbSongData.album,
           coverPhotoURL: dbSongData.coverPhotoURL,
-          lyrics: dbSongData.lyrics ?? "",
+          lyrics: dbSongData.lyrics,
         };
       }
 
@@ -120,8 +121,18 @@ export const lyricsRouter = createTRPCRouter({
           coverPhotoURL: songData.coverPhotoURL,
           lyrics: songData.lyrics,
         })
+        .onDuplicateKeyUpdate({
+          set: {
+            title: sql`VALUES(title)`,
+            artist: sql`VALUES(artist)`,
+            album: sql`VALUES(album)`,
+            coverPhotoURL: sql`VALUES(cover_photo_url)`,
+            lyrics: sql`VALUES(lyrics)`,
+          },
+        })
         .execute()
         .catch(console.error);
+
       return {
         title: songData.title,
         artist: songData.artist,
@@ -204,7 +215,6 @@ export const lyricsRouter = createTRPCRouter({
         });
       }
       if (Date.now() - createdAt < MIN_PLAYTIME_SECONDS * 1000) {
-        console.log(Date.now() - createdAt);
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Not enough playtime",
