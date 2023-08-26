@@ -121,7 +121,7 @@ export function AlbumDisplaySkeleton() {
             variant="secondary"
             disabled
           ></Button>
-          <ul>
+          <ul className="grow">
             {Array.from(Array(6), (_, index) => (
               <AlbumSongSkeleton key={index} />
             ))}
@@ -134,8 +134,8 @@ export function AlbumDisplaySkeleton() {
 
 export function AlbumSongSkeleton() {
   return (
-    <li className="w-full rounded-lg px-3 py-1.5 max-md:py-1 max-md:text-sm">
-      <Skeleton className="h-8 w-96" />
+    <li className="rounded-lg px-3 py-1.5 max-md:py-1 max-md:text-sm">
+      <Skeleton className="h-8 w-full" />
     </li>
   );
 }
