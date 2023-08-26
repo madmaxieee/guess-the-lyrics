@@ -19,7 +19,7 @@ export default function GamePage() {
   return (
     <>
       <Head>
-        <title>{`guess the lyrics. | ${songData.data?.title ?? ""}`}</title>
+        <title>guess the lyrics.</title>
         <SEO />
       </Head>
       <main className="flex min-h-screen flex-col items-center">
