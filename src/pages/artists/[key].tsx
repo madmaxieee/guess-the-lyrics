@@ -34,7 +34,7 @@ export default function ArtistPage() {
   return (
     <>
       <Head>
-        <title>{`guess the lyrics. | ${artistData.data?.name}`}</title>
+        <title>{`guess the lyrics. | ${artistData.data?.name ?? ""}`}</title>
         <SEO />
       </Head>
       <main className="flex min-h-screen flex-col items-center">
@@ -85,7 +85,7 @@ export default function ArtistPage() {
                           <h2 className="text-2xl font-bold">other songs:</h2>
                         </div>
                         <div className="col-span-3 flex gap-3">
-                          <ul>
+                          <ul className="grow">
                             {artistData.data.otherSongs.map((song) => (
                               <AlbumSong song={song} key={song.title} />
                             ))}

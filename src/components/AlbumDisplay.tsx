@@ -73,7 +73,7 @@ export default function AlbumDisplay({ album, artistKey }: AlbumDisplayProps) {
           >
             <Shuffle size="1.25em" />
           </Button>
-          <ul>
+          <ul className="grow">
             {album.songs.map((song) => (
               <AlbumSong song={song} key={song.title} />
             ))}
@@ -91,7 +91,7 @@ export function AlbumSong({
 }) {
   return (
     <Link href={`/play/${path}`} key={title}>
-      <li className="mb-1 rounded-lg px-3 py-1.5 transition-all hover:translate-x-2 hover:bg-accent hover:font-bold max-md:py-1 max-md:text-sm max-md:underline">
+      <li className="mb-1 w-full rounded-lg px-3 py-1.5 transition-all hover:translate-x-2 hover:bg-accent hover:font-bold max-md:py-1 max-md:text-sm max-md:underline">
         {title}
       </li>
     </Link>
