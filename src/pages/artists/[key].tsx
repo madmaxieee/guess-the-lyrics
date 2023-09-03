@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-import { Layout, Shuffle } from "lucide-react";
+import { Shuffle } from "lucide-react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
@@ -8,6 +8,7 @@ import AlbumDisplay, {
   AlbumDisplaySkeleton,
   AlbumSong,
 } from "@/components/AlbumDisplay";
+import Layout from "@/components/Layout";
 import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
