@@ -4,8 +4,8 @@ import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/router";
 
-import banner from "@/assets/banner.svg";
-import Header from "@/components/Header";
+import bannerImage from "@/assets/banner.svg";
+import Layout from "@/components/Layout";
 import SEO from "@/components/SEO";
 import SearchResult, { SearchResultSkeleton } from "@/components/SearchResult";
 import { Button } from "@/components/ui/button";
@@ -69,12 +69,11 @@ export default function Home() {
         <title>guess the lyrics.</title>
         <SEO />
       </Head>
-      <main className="h-full min-h-screen flex-col items-center">
-        <Header />
+      <Layout>
         <Image
           priority
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          src={banner}
+          src={bannerImage}
           className="mx-auto mt-8 max-w-4xl max-sm:w-full"
           alt="Are you a real fan? guess the lyrics!"
         />
@@ -129,7 +128,7 @@ export default function Home() {
             </ul>
           ) : null}
         </div>
-      </main>
+      </Layout>
     </>
   );
 }

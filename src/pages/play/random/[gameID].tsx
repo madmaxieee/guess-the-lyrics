@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import GuessTheLyrics, {
   GuessTheLyricsSkeleton,
 } from "@/components/GuessTheLyrics";
-import Header from "@/components/Header";
+import Layout from "@/components/Layout";
 import SEO from "@/components/SEO";
 import { api } from "@/utils/api";
 
@@ -22,8 +22,7 @@ export default function GamePage() {
         <title>guess the lyrics.</title>
         <SEO />
       </Head>
-      <main className="flex min-h-screen flex-col items-center">
-        <Header />
+      <Layout>
         {songData.isLoading ? (
           <GuessTheLyricsSkeleton />
         ) : songData.isError ? (
@@ -38,7 +37,7 @@ export default function GamePage() {
             hideInfo
           />
         ) : null}
-      </main>
+      </Layout>
     </>
   );
 }

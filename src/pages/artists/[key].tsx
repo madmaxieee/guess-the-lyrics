@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-import { Shuffle } from "lucide-react";
+import { Layout, Shuffle } from "lucide-react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
@@ -8,7 +8,6 @@ import AlbumDisplay, {
   AlbumDisplaySkeleton,
   AlbumSong,
 } from "@/components/AlbumDisplay";
-import Header from "@/components/Header";
 import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -37,8 +36,7 @@ export default function ArtistPage() {
         <title>{`guess the lyrics. | ${artistData.data?.name ?? ""}`}</title>
         <SEO />
       </Head>
-      <main className="flex min-h-screen flex-col items-center">
-        <Header />
+      <Layout>
         <div className="mx-auto mb-16 mt-8 w-full max-w-4xl text-xl max-md:mx-1">
           {artistData.isLoading ? (
             <>
@@ -103,7 +101,7 @@ export default function ArtistPage() {
             </div>
           ) : null}
         </div>
-      </main>
+      </Layout>
     </>
   );
 }
