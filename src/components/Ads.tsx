@@ -31,7 +31,7 @@ export function FooterAd() {
         style={{ display: "block" }}
         data-ad-client={env.NEXT_PUBLIC_ADSENSE_ID}
         data-ad-slot="8547846577"
-        data-ad-format="auto"
+        data-ad-format="rectangle"
         data-full-width-responsive="true"
       ></ins>
       <Script
