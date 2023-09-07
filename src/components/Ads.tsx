@@ -1,49 +1,45 @@
-import { useEffect, useState } from "react";
+import Script from "next/script";
 
 import { env } from "@/env.mjs";
 
 export function InArticleAd() {
-  const [isClient, setIsClient] = useState(false);
-  useEffect(() => setIsClient(true), []);
-
   return (
     <>
-      {isClient && (
-        <>
-          <ins
-            className="adsbygoogle"
-            style={{ display: "block", textAlign: "center" }}
-            data-ad-layout="in-article"
-            data-ad-format="fluid"
-            data-ad-client={env.NEXT_PUBLIC_ADSENSE_ID}
-            data-ad-slot="7422752571"
-          ></ins>
-          <script>{`(adsbygoogle = window.adsbygoogle || []).push({});`}</script>
-        </>
-      )}
+      <ins
+        className="adsbygoogle"
+        style={{ display: "block", textAlign: "center" }}
+        data-ad-layout="in-article"
+        data-ad-format="fluid"
+        data-ad-client={env.NEXT_PUBLIC_ADSENSE_ID}
+        data-ad-slot="7422752571"
+      ></ins>
+      <Script
+        id="adsense-id"
+        dangerouslySetInnerHTML={{
+          __html: "(adsbygoogle = window.adsbygoogle || []).push({});",
+        }}
+      />
     </>
   );
 }
 
 export function FooterAd() {
-  const [isClient, setIsClient] = useState(false);
-  useEffect(() => setIsClient(true), []);
-
   return (
     <>
-      {isClient && (
-        <>
-          <ins
-            className="adsbygoogle"
-            style={{ display: "block" }}
-            data-ad-client={env.NEXT_PUBLIC_ADSENSE_ID}
-            data-ad-slot="8547846577"
-            data-ad-format="auto"
-            data-full-width-responsive="true"
-          ></ins>
-          <script>{`(adsbygoogle = window.adsbygoogle || []).push({});`}</script>
-        </>
-      )}
+      <ins
+        className="adsbygoogle"
+        style={{ display: "block" }}
+        data-ad-client={env.NEXT_PUBLIC_ADSENSE_ID}
+        data-ad-slot="8547846577"
+        data-ad-format="auto"
+        data-full-width-responsive="true"
+      ></ins>
+      <Script
+        id="adsense-id"
+        dangerouslySetInnerHTML={{
+          __html: "(adsbygoogle = window.adsbygoogle || []).push({});",
+        }}
+      />
     </>
   );
 }
