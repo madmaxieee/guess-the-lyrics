@@ -4,7 +4,7 @@ import { env } from "@/env.mjs";
 
 export function InArticleAd() {
   return (
-    <div className="grid w-screen max-w-5xl place-items-center">
+    <div className="w-screen md:w-[768px] xl:w-[1280px]">
       <ins
         className="adsbygoogle"
         style={{ display: "block", textAlign: "center" }}
@@ -25,13 +25,13 @@ export function InArticleAd() {
 
 export function FooterAd() {
   return (
-    <div className="grid w-full place-items-center">
+    <div className="w-screen md:w-[768px] xl:w-[1280px]">
       <ins
         className="adsbygoogle"
         style={{ display: "block" }}
         data-ad-client={env.NEXT_PUBLIC_ADSENSE_ID}
         data-ad-slot="8547846577"
-        data-ad-format="rectangle"
+        data-ad-format="auto"
         data-full-width-responsive="true"
       ></ins>
       <Script
