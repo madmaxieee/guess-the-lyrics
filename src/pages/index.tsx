@@ -78,7 +78,7 @@ export default function Home() {
           alt="Are you a real fan? guess the lyrics!"
         />
         <div className="mx-auto my-8 max-w-4xl text-xl max-md:px-6">
-          <div className="mx-8 my-6 flex justify-center gap-4">
+          <div className="flex justify-center gap-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="w-16">
@@ -94,7 +94,11 @@ export default function Home() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Input className="w-72" ref={searchBoxRef} onKeyUp={onEnter} />
+            <Input
+              className="grow md:w-72"
+              ref={searchBoxRef}
+              onKeyUp={onEnter}
+            />
             <Button
               disabled={
                 searchMutation.isLoading || searchBoxRef.current?.value === ""
