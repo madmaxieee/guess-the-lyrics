@@ -4,7 +4,7 @@ import { env } from "@/env.mjs";
 
 export function InArticleAd() {
   return (
-    <>
+    <div className="grid w-full place-items-center">
       <ins
         className="adsbygoogle"
         style={{ display: "block", textAlign: "center" }}
@@ -19,16 +19,16 @@ export function InArticleAd() {
           __html: "(adsbygoogle = window.adsbygoogle || []).push({});",
         }}
       />
-    </>
+    </div>
   );
 }
 
 export function FooterAd() {
   return (
-    <>
+    <div className="grid w-full place-items-center">
       <ins
         className="adsbygoogle"
-        style={{ display: "block", margin: "0 auto" }}
+        style={{ display: "block" }}
         data-ad-client={env.NEXT_PUBLIC_ADSENSE_ID}
         data-ad-slot="8547846577"
         data-ad-format="auto"
@@ -40,6 +40,6 @@ export function FooterAd() {
           __html: "(adsbygoogle = window.adsbygoogle || []).push({});",
         }}
       />
-    </>
+    </div>
   );
 }
