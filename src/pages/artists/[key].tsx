@@ -70,14 +70,10 @@ export default function ArtistPage() {
               </div>
               <div className="flex flex-col gap-8 max-md:gap-4 max-md:px-2">
                 {artistData.data.albums.map((album, i) => (
-                  <>
+                  <React.Fragment key={album.name}>
+                    <AlbumDisplay album={album} artistKey={artistKey} />
                     {i % 3 === 2 && <InArticleAd />}
-                    <AlbumDisplay
-                      key={album.name}
-                      album={album}
-                      artistKey={artistKey}
-                    />
-                  </>
+                  </React.Fragment>
                 ))}
                 {artistData.data?.otherSongs &&
                   artistData.data?.otherSongs.length > 0 && (

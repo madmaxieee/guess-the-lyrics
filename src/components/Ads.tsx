@@ -4,7 +4,7 @@ import { env } from "@/env.mjs";
 
 export function InArticleAd() {
   return (
-    <div className="grid w-full place-items-center">
+    <div className="grid w-screen max-w-5xl place-items-center">
       <ins
         className="adsbygoogle"
         style={{ display: "block", textAlign: "center" }}
