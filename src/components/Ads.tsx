@@ -4,7 +4,7 @@ import { env } from "@/env.mjs";
 
 export function InArticleAd() {
   return (
-    <div className="w-screen md:w-[768px] xl:w-[1280px]">
+    <div className="max-sm:hidden sm:w-[640px] md:w-[768px] xl:w-[1280px]">
       <ins
         className="adsbygoogle"
         style={{ display: "block", textAlign: "center" }}
@@ -25,7 +25,7 @@ export function InArticleAd() {
 
 export function FooterAd() {
   return (
-    <div className="w-screen md:w-[768px] xl:w-[1280px]">
+    <div className="max-sm:hidden sm:w-[640px] md:w-[768px] xl:w-[1280px]">
       <ins
         className="adsbygoogle"
         style={{ display: "block" }}
