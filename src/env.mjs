@@ -25,7 +25,7 @@ export const env = createEnv({
   client: {
     // NEXT_PUBLIC_CLIENTVAR: z.string().min(1),
     NEXT_PUBLIC_DOMAIN: z.string().url(),
-    NEXT_PUBLIC_ADSENSE_SCRIPT_URL: z.string().url(),
+    NEXT_PUBLIC_ADSENSE_ID: z.string().min(1),
   },
 
   /**
@@ -42,8 +42,9 @@ export const env = createEnv({
     BROWSERLESS_URL: process.env.BROWSERLESS_URL,
     PROXY_URL: process.env.PROXY_URL,
     NEXT_PUBLIC_DOMAIN: process.env.NEXT_PUBLIC_DOMAIN,
-    NEXT_PUBLIC_ADSENSE_SCRIPT_URL: process.env.NEXT_PUBLIC_ADSENSE_SCRIPT_URL,
+    NEXT_PUBLIC_ADSENSE_ID: process.env.NEXT_PUBLIC_ADSENSE_ID,
   },
+
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.
    * This is especially useful for Docker builds.

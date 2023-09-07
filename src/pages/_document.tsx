@@ -1,4 +1,5 @@
 import { Html, Head, Main, NextScript } from "next/document";
+import Script from "next/script";
 
 import { env } from "@/env.mjs";
 
@@ -7,12 +8,14 @@ export default function Document() {
     <Html lang="en">
       <Head />
       <body>
-        <Main />
-        <script
+        <Script
+          id="adsense-id"
           async
-          src={env.NEXT_PUBLIC_ADSENSE_SCRIPT_URL}
+          strategy="afterInteractive"
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${env.NEXT_PUBLIC_ADSENSE_ID}`}
           crossOrigin="anonymous"
-        ></script>
+        />
+        <Main />
         <NextScript />
       </body>
     </Html>
