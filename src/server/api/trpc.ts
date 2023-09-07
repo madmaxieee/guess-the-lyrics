@@ -59,7 +59,7 @@ export const createTRPCContext = (_opts: CreateNextContextOptions) => {
         "Set-Cookie",
         `${key}=${value}; Path=${opts.path ?? "/"}; ${
           opts.httpOnly ? "HttpOnly; " : ""
-        } Max-Age=${opts.maxAge ?? -1}`
+        } Max-Age=${opts.maxAge ?? -1}; SameSite=Lax`
       );
     },
   };
