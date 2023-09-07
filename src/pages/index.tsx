@@ -77,8 +77,8 @@ export default function Home() {
           className="mx-auto mt-8 max-w-4xl max-sm:w-full"
           alt="Are you a real fan? guess the lyrics!"
         />
-        <div className="mx-auto my-8 max-w-4xl text-xl max-md:px-6">
-          <div className="flex justify-center gap-4">
+        <div className="mx-auto my-8 w-full max-w-4xl text-xl max-md:px-6">
+          <div className="my-6 flex justify-center gap-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="w-16">
@@ -95,7 +95,7 @@ export default function Home() {
               </DropdownMenuContent>
             </DropdownMenu>
             <Input
-              className="grow md:w-72"
+              className="grow md:w-72 md:grow-0"
               ref={searchBoxRef}
               onKeyUp={onEnter}
             />
@@ -109,7 +109,7 @@ export default function Home() {
             </Button>
           </div>
           {searchMutation.isLoading ? (
-            <ul className="mx-auto flex max-w-2xl flex-col gap-3">
+            <ul className="mx-auto flex max-w-2xl flex-col gap-3 max-md:gap-2">
               {Array.from(Array(RESULT_LIMIT), (_, index) => (
                 <li key={index}>
                   <SearchResultSkeleton />
