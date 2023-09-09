@@ -1,6 +1,6 @@
 export function songurl2path(url: string): string {
   const match = url.match(
-    /https:\/\/www\.azlyrics\.com\/lyrics\/([a-z0-9]+\/[a-z0-9]+)\.html/
+    /https:\/\/www\.azlyrics\.com\/lyrics\/([a-z0-9\-]+\/[a-z0-9\-]+)\.html/
   );
   if (match) {
     return match[1]!;
@@ -18,7 +18,7 @@ export function songpath2url(path: string): string {
 
 export function artisturl2key(url: string) {
   const match = url.match(
-    /https:\/\/www\.azlyrics\.com\/([a-z]|19)\/([a-z0-9]+)\.html/
+    /https:\/\/www\.azlyrics\.com\/([a-z]|19)\/([a-z0-9\-]+)\.html/
   );
   if (match) {
     return match[2]!;
@@ -28,7 +28,7 @@ export function artisturl2key(url: string) {
 }
 
 export function artistkey2url(key: string) {
-  if (!/^[a-z0-9]+$/.test(key)) {
+  if (!/^[a-z0-9\-]+$/.test(key)) {
     throw new Error(`Invalid path: ${key}`);
   }
   let prefix = key[0]!;
