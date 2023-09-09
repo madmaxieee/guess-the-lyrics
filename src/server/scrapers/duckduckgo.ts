@@ -58,14 +58,20 @@ class DuckDuckGoResult {
 
     const tables = document.querySelectorAll("table");
 
-    // find the longest table
-    const resultsTable = Array.from(tables).reduce((prev, curr) => {
-      if (curr.rows.length > prev.rows.length) {
-        return curr;
-      } else {
-        return prev;
-      }
-    });
+    let resultsTable: HTMLTableElement = document.createElement("table");
+
+    try {
+      // find the longest table
+      resultsTable = Array.from(tables).reduce((prev, curr) => {
+        if (curr.rows.length > prev.rows.length) {
+          return curr;
+        } else {
+          return prev;
+        }
+      });
+    } catch (e) {
+      throw new Error("Search results not found");
+    }
 
     const currentItem: DuckDuckGoResultItem = {
       title: "",
