@@ -3,6 +3,7 @@ import { JSDOM } from "jsdom";
 import { env } from "@/env.mjs";
 import { songurl2path } from "@/utils/client";
 
+import { BlockExternalResourceLoader } from "./resourceLoader";
 import { fetchScrape, proxyScrape } from "./scrapers";
 
 export type SongData = {
@@ -42,7 +43,9 @@ export async function fetchSongData(url: string): Promise<SongData> {
 }
 
 function parseLyricsPage(html: string): Omit<SongData, "id" | "path"> {
-  const document = new JSDOM(html).window.document;
+  const document = new JSDOM(html, {
+    resources: new BlockExternalResourceLoader(),
+  }).window.document;
 
   // normal lyrics page only has one h1
   if (document.querySelectorAll("h1").length > 1) {
@@ -65,6 +68,7 @@ function parseLyricsPage(html: string): Omit<SongData, "id" | "path"> {
     console.error(html);
     throw new Error("No divs found");
   }
+
   // find the longest div's text
   const lyricsDiv = Array.from(divs).reduce((prev, curr) => {
     if ((curr.textContent ?? "").length > (prev.textContent ?? "").length) {
@@ -145,9 +149,11 @@ function parseArtistPage(html: string): ArtistData {
     albums: [],
   };
 
-  const document = new JSDOM(html).window.document;
+  const document = new JSDOM(html, {
+    resources: new BlockExternalResourceLoader(),
+  }).window.document;
   const artistName = (document.querySelector("h1>strong")?.textContent ?? "")
-    .replace(/\s*[lL]yrics\s*$/, "")
+    .replace(/\s*lyrics\s*$/i, "")
     .trim();
 
   artistData.name = artistName;

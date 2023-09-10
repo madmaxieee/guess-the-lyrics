@@ -1,5 +1,6 @@
 import { JSDOM } from "jsdom";
 
+import { BlockExternalResourceLoader } from "./resourceLoader";
 import { fetchScrape } from "./scrapers";
 
 type DuckDuckGoResultItem = {
@@ -54,7 +55,9 @@ class DuckDuckGoResult {
   }
 
   private _parse() {
-    const document = new JSDOM(this._html).window.document;
+    const document = new JSDOM(this._html, {
+      resources: new BlockExternalResourceLoader(),
+    }).window.document;
 
     const tables = document.querySelectorAll("table");
 
