@@ -18,7 +18,7 @@ export const ratelimit = {
   other: new Ratelimit({
     redis: redis,
     prefix: "ratelimit:api",
-    limiter: Ratelimit.slidingWindow(10, "1 s"),
+    limiter: Ratelimit.slidingWindow(20, "1 s"),
     analytics: true,
   }),
 };
