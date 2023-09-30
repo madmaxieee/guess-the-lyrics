@@ -5,7 +5,6 @@ import { Roboto_Mono } from "next/font/google";
 
 import { Analytics } from "@vercel/analytics/react";
 
-import "@/styles/globals.css";
 import { api } from "@/utils/api";
 
 const robotoMono = Roboto_Mono({
