@@ -4,7 +4,6 @@ import { Shuffle } from "lucide-react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
-import { InArticleAd } from "@/components/Ads";
 import AlbumDisplay, {
   AlbumDisplaySkeleton,
   AlbumSong,
@@ -69,11 +68,12 @@ export default function ArtistPage() {
                 </Button>
               </div>
               <div className="flex flex-col gap-8 max-md:gap-4 max-md:px-2">
-                {artistData.data.albums.map((album, i) => (
-                  <React.Fragment key={album.name}>
-                    <AlbumDisplay album={album} artistKey={artistKey} />
-                    {i % 3 === 2 && <InArticleAd />}
-                  </React.Fragment>
+                {artistData.data.albums.map((album) => (
+                  <AlbumDisplay
+                    key={album.name}
+                    album={album}
+                    artistKey={artistKey}
+                  />
                 ))}
                 {artistData.data?.otherSongs &&
                   artistData.data?.otherSongs.length > 0 && (
