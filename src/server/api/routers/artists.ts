@@ -34,7 +34,7 @@ export const artistRouter = createTRPCRouter({
       const topResults = results
         .items()
         .filter((result) =>
-          /https:\/\/www\.azlyrics\.com\/([a-z]|19)\/[a-z0-9]+\.html/.test(
+          /https:\/\/www\.azlyrics\.com\/([a-z]|19)\/[a-z0-9\-]+\.html/.test(
             result.url
           )
         )

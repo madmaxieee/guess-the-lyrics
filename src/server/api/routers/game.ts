@@ -143,7 +143,7 @@ export const gameRouter = createTRPCRouter({
     }),
 
   start: publicProcedure
-    .input(z.object({ path: z.string().regex(/[a-z0-9]+\/[a-z0-9]+/) }))
+    .input(z.object({ path: z.string().regex(/[a-z0-9\-]+\/[a-z0-9\-]+/) }))
     .mutation(async ({ input, ctx }) => {
       const { success } = await ratelimit.other.limit("game.start");
       if (!success) {
@@ -178,7 +178,7 @@ export const gameRouter = createTRPCRouter({
     }),
 
   count: publicProcedure
-    .input(z.object({ path: z.string().regex(/[a-z0-9]+\/[a-z0-9]+/) }))
+    .input(z.object({ path: z.string().regex(/[a-z0-9\-]+\/[a-z0-9\-]+/) }))
     .mutation(async ({ input, ctx }) => {
       const { success } = await ratelimit.other.limit("game.count");
       if (!success) {

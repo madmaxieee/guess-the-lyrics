@@ -19,7 +19,7 @@ const scrape = env.NODE_ENV === "production" ? proxyScrape : fetchScrape;
 
 export async function fetchSongData(url: string): Promise<SongData> {
   if (
-    !/^https:\/\/www\.azlyrics\.com\/lyrics\/([a-z0-9]+\/[a-z0-9]+)\.html$/.test(
+    !/^https:\/\/www\.azlyrics\.com\/lyrics\/([a-z0-9\-]+\/[a-z0-9\-]+)\.html$/.test(
       url
     )
   ) {
@@ -109,7 +109,7 @@ function parseLyricsPage(html: string): Omit<SongData, "id" | "path"> {
 
 export async function fetchArtistData(url: string) {
   if (
-    !/https:\/\/www\.azlyrics\.com\/([a-z]|19)\/([a-z0-9]+)\.html/.test(url)
+    !/https:\/\/www\.azlyrics\.com\/([a-z]|19)\/([a-z0-9\-]+)\.html/.test(url)
   ) {
     throw new Error(`Invalid URL: ${url}`);
   }
@@ -194,7 +194,7 @@ function parseArtistPage(html: string): ArtistData {
 
       const songTitle = anchor.textContent?.trim() ?? "";
       const songPath = (anchor.getAttribute("href")?.trim() ?? "").match(
-        /\/lyrics\/([a-z0-9]+\/[a-z0-9]+)\.html/
+        /\/lyrics\/([a-z0-9\-]+\/[a-z0-9\-]+)\.html/
       )?.[1];
 
       if (!songPath) continue;

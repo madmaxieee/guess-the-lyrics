@@ -50,7 +50,7 @@ export const lyricsRouter = createTRPCRouter({
       z.object({
         path: z
           .string()
-          .regex(/[a-z0-9]+\/[a-z0-9]+/)
+          .regex(/[a-z0-9\-]+\/[a-z0-9\-]+/)
           .nullish(),
       })
     )
