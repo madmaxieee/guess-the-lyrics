@@ -1,16 +1,14 @@
-import { drizzle } from "drizzle-orm/planetscale-serverless";
+import { drizzle } from "drizzle-orm/libsql";
 
-import { connect } from "@planetscale/database";
+import { createClient } from "@libsql/client";
 
 import { env } from "@/env.mjs";
 
-// create the connection
-const connection = connect({
-  host: env.DATABASE_HOST,
-  username: env.DATABASE_USERNAME,
-  password: env.DATABASE_PASSWORD,
+const turso = createClient({
+  url: env.TURSO_DATABASE_URL,
+  authToken: env.TURSO_AUTH_TOKEN,
 });
 
-const db = drizzle(connection);
+const db = drizzle(turso);
 
 export default db;

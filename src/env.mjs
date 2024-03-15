@@ -8,9 +8,8 @@ export const env = createEnv({
    */
   server: {
     NODE_ENV: z.enum(["development", "test", "production"]),
-    DATABASE_HOST: z.string().min(1),
-    DATABASE_USERNAME: z.string().min(1),
-    DATABASE_PASSWORD: z.string().min(1),
+    TURSO_DATABASE_URL: z.string().url(),
+    TURSO_AUTH_TOKEN: z.string().min(1),
     UPSTASH_TOKEN: z.string().min(1),
     UPSTASH_URL: z.string().min(1),
     BROWSERLESS_URL: z.string().url(),
@@ -34,9 +33,8 @@ export const env = createEnv({
    */
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
-    DATABASE_HOST: process.env.DATABASE_HOST,
-    DATABASE_USERNAME: process.env.DATABASE_USERNAME,
-    DATABASE_PASSWORD: process.env.DATABASE_PASSWORD,
+    TURSO_DATABASE_URL: process.env.TURSO_DATABASE_URL,
+    TURSO_AUTH_TOKEN: process.env.TURSO_AUTH_TOKEN,
     UPSTASH_TOKEN: process.env.UPSTASH_TOKEN,
     UPSTASH_URL: process.env.UPSTASH_URL,
     BROWSERLESS_URL: process.env.BROWSERLESS_URL,
