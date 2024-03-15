@@ -5,7 +5,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 
 import db from "@/db";
-import { NewSong, songs_insert } from "@/db/_schema";
+import { type NewSong, songs_insert } from "@/db/_schema";
 import { artists, type Song, songs_select } from "@/db/schema";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import {
