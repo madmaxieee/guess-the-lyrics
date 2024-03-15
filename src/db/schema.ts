@@ -6,21 +6,21 @@ import {
   integer,
 } from "drizzle-orm/sqlite-core";
 
-const artist_key = customType<{ data: string }>({
+const artist_key = customType<{ data: string; notNull: true; default: true }>({
   dataType() {
     return `TEXT GENERATED ALWAYS AS (substr(path, 1, instr(path, '/') - 1))`;
   },
 });
 
-export const songs = sqliteTable(
+export const songs_select = sqliteTable(
   "songs",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
     path: text("path", { length: 256 }).unique().notNull(),
     title: text("title", { length: 128 }),
     artist: text("artist", { length: 128 }),
-    lyrics: text("lyrics", { length: 10000 }),
     album: text("album", { length: 128 }),
+    lyrics: text("lyrics", { length: 10000 }),
     coverPhotoURL: text("cover_photo_url", { length: 128 }),
     timesPlayed: integer("times_played").default(0),
     artistKey: artist_key("artist_key"),
@@ -32,8 +32,7 @@ export const songs = sqliteTable(
   })
 );
 
-export type Song = typeof songs.$inferSelect;
-export type NewSong = typeof songs.$inferInsert;
+export type Song = typeof songs_select.$inferSelect;
 
 export const artists = sqliteTable(
   "artists",

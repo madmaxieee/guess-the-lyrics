@@ -5,7 +5,8 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 
 import db from "@/db";
-import { artists, type Song, type NewSong, songs } from "@/db/schema";
+import { NewSong, songs_insert } from "@/db/_schema";
+import { artists, type Song, songs_select } from "@/db/schema";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import {
   type ArtistData,
@@ -53,25 +54,22 @@ export const artistRouter = createTRPCRouter({
   fromAZkey: publicProcedure
     .input(z.object({ key: z.string().min(1).nullish() }))
     .query(async ({ input }) => {
-      if (!input.key) return null;
+      if (typeof input.key !== "string") return null;
 
       const dbSongList = await db
         .select({
-          path: songs.path,
-          title: songs.title,
-          artist: songs.artist,
-          coverPhotoURL: songs.coverPhotoURL,
-          album: songs.album,
+          path: songs_select.path,
+          title: songs_select.title,
+          artist: songs_select.artist,
+          coverPhotoURL: songs_select.coverPhotoURL,
+          album: songs_select.album,
         })
         .from(artists)
-        .innerJoin(songs, eq(artists.key, songs.artistKey))
+        .innerJoin(songs_select, eq(artists.key, songs_select.artistKey))
         .where(
           and(
             eq(artists.key, input.key),
-            gt(
-              artists.lastSongListUpdate,
-              sql`CURRENT_TIMESTAMP - INTERVAL 90 DAY`
-            )
+            gt(artists.lastSongListUpdate, sql`datetime('now', '-90 days')`)
           )
         )
         .execute();
@@ -124,14 +122,18 @@ export const artistRouter = createTRPCRouter({
       }
 
       db.transaction(async (tx) => {
-        await tx.insert(songs).ignore().values(valuesToInsert);
+        await tx
+          .insert(songs_insert)
+          .values(valuesToInsert)
+          .onConflictDoNothing();
         await tx
           .insert(artists)
           .values({
             key: input.key!,
             lastSongListUpdate: sql`CURRENT_TIMESTAMP`,
           })
-          .onDuplicateKeyUpdate({
+          .onConflictDoUpdate({
+            target: artists.key,
             set: {
               lastSongListUpdate: sql`CURRENT_TIMESTAMP`,
             },

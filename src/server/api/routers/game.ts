@@ -7,7 +7,7 @@ import { TRPCError } from "@trpc/server";
 
 import db from "@/db";
 import redis from "@/db/redis";
-import { songs } from "@/db/schema";
+import { songs_select } from "@/db/schema";
 import { ratelimit } from "@/server/api/ratelimit";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import {
@@ -47,16 +47,16 @@ export const gameRouter = createTRPCRouter({
       if (input.artistKey) {
         const [randomSong] = await db
           .select({
-            path: songs.path,
+            path: songs_select.path,
           })
-          .from(songs)
+          .from(songs_select)
           .where(
             input.album
               ? and(
-                  eq(songs.artistKey, input.artistKey),
-                  eq(songs.album, input.album)
+                  eq(songs_select.artistKey, input.artistKey),
+                  eq(songs_select.album, input.album)
                 )
-              : eq(songs.artistKey, input.artistKey)
+              : eq(songs_select.artistKey, input.artistKey)
           )
           .orderBy(sql`RAND()`)
           .limit(1)
@@ -73,9 +73,9 @@ export const gameRouter = createTRPCRouter({
       } else {
         const [randomSong] = await db
           .select({
-            path: songs.path,
+            path: songs_select.path,
           })
-          .from(songs)
+          .from(songs_select)
           .orderBy(sql`RAND()`)
           .limit(1)
           .execute();
@@ -223,9 +223,9 @@ export const gameRouter = createTRPCRouter({
 
       try {
         await db
-          .update(songs)
-          .set({ timesPlayed: sql`${songs.timesPlayed} + 1` })
-          .where(eq(songs.path, input.path))
+          .update(songs_select)
+          .set({ timesPlayed: sql`${songs_select.timesPlayed} + 1` })
+          .where(eq(songs_select.path, input.path))
           .execute();
       } catch (e) {
         console.error(e);

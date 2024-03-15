@@ -1,10 +1,11 @@
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { TRPCError } from "@trpc/server";
 
 import db from "@/db";
-import { songs } from "@/db/schema";
+import { songs_insert } from "@/db/_schema";
+import { songs_select } from "@/db/schema";
 import { ratelimit } from "@/server/api/ratelimit";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { type SongData, fetchSongData } from "@/server/scrapers/azlyricsParser";
@@ -69,14 +70,14 @@ export const lyricsRouter = createTRPCRouter({
 
       const [dbSongData] = await db
         .select({
-          title: songs.title,
-          artist: songs.artist,
-          album: songs.album,
-          coverPhotoURL: songs.coverPhotoURL,
-          lyrics: songs.lyrics,
+          title: songs_select.title,
+          artist: songs_select.artist,
+          album: songs_select.album,
+          coverPhotoURL: songs_select.coverPhotoURL,
+          lyrics: songs_select.lyrics,
         })
-        .from(songs)
-        .where(eq(songs.path, input.path))
+        .from(songs_select)
+        .where(eq(songs_select.path, input.path))
         .execute();
       if (dbSongData?.lyrics) {
         return {
@@ -119,7 +120,7 @@ export const lyricsRouter = createTRPCRouter({
         });
       }
 
-      db.insert(songs)
+      db.insert(songs_insert)
         .values({
           path: input.path,
           title: songData.title,
@@ -128,13 +129,14 @@ export const lyricsRouter = createTRPCRouter({
           coverPhotoURL: songData.coverPhotoURL,
           lyrics: songData.lyrics,
         })
-        .onDuplicateKeyUpdate({
+        .onConflictDoUpdate({
+          target: songs_select.path,
           set: {
-            title: sql`VALUES(title)`,
-            artist: sql`VALUES(artist)`,
-            album: sql`VALUES(album)`,
-            coverPhotoURL: sql`VALUES(cover_photo_url)`,
-            lyrics: sql`VALUES(lyrics)`,
+            title: songData.title,
+            artist: songData.artist,
+            album: songData.album,
+            coverPhotoURL: songData.coverPhotoURL,
+            lyrics: songData.lyrics,
           },
         })
         .execute()
