@@ -81,16 +81,15 @@ export default function GuessTheLyrics({
         });
       });
 
-      const newScore = score + correctIndices.length;
-      setScore(newScore);
-      if (newScore === totalWords) {
-        setGameState("ENDED");
-        setShowWinDialog(true);
-      }
-
+      setScore((_score) => _score + correctIndices.length);
       setCurrentWord("");
 
       delete answerMap[key];
+
+      if (Object.keys(answerMap).length == 0) {
+        setGameState("ENDED");
+        setShowWinDialog(true);
+      }
     } else {
       setCurrentWord(word);
     }
