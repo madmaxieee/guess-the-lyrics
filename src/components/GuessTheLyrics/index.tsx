@@ -14,6 +14,7 @@ import { type RouterOutput } from "@/utils/routerTypes";
 import { cn } from "@/utils/ui";
 
 import Timer from "./Timer";
+import WordDisplay from "./WordDisplay";
 
 type GuessTheLyricsProps = {
   songData: Exclude<RouterOutput["lyrics"]["fromAZpath"], null>;
@@ -209,20 +210,14 @@ export default function GuessTheLyrics({
 
         <p className="font-mono text-xl text-gray-500 max-md:mx-2">
           {answerArray.map((word, index) => (
-            <span
+            <WordDisplay
               key={index}
-              className={cn({
-                "text-red-500": gameState === "ENDED" && !isCorrect[index],
-                "text-green-500":
-                  gameState !== "ENDED" && lastCorrect.has(index),
-                "text-yellow-500":
-                  gameState !== "ENDED" && guessedWords.has(index),
-              })}
-            >
-              {gameState === "ENDED" || isCorrect[index]
-                ? word
-                : "_".repeat(word.length)}{" "}
-            </span>
+              word={word}
+              isCorrectWord={!!isCorrect[index]}
+              isGameEnded={gameState === "ENDED"}
+              isGuessedWord={guessedWords.has(index)}
+              isLastCorrectWord={lastCorrect.has(index)}
+            />
           ))}
         </p>
       </div>
