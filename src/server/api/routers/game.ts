@@ -180,6 +180,8 @@ export const gameRouter = createTRPCRouter({
         });
       }
 
+      if (env.NODE_ENV !== "production") return;
+
       try {
         await db
           .update(songs_select)
