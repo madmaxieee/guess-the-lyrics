@@ -36,6 +36,15 @@ export default function GuessTheLyrics({
 
   const answerArray = useMemo(() => lyrics.split(/\s+/), [lyrics]);
   const totalWords = useMemo(() => answerArray.length, [answerArray]);
+  const wordsMap = useMemo(() => {
+    const map: Record<string, number[]> = {};
+    answerArray.forEach((word, index) => {
+      const key = toKey(word);
+      map[key] ??= [];
+      map[key]!.push(index);
+    });
+    return map;
+  }, [answerArray]);
   const answerMap = useMemo(() => {
     const map: Record<string, number[]> = {};
     answerArray.forEach((word, index) => {
@@ -50,6 +59,7 @@ export default function GuessTheLyrics({
     answerArray.map(() => false)
   );
   const [lastCorrect, setLastCorrect] = useState<Set<number>>(new Set());
+  const [guessedWords, setGuessedWords] = useState<Set<number>>(new Set());
 
   const startGame = api.game.start.useMutation();
   const countPlay = api.game.count.useMutation();
@@ -70,10 +80,11 @@ export default function GuessTheLyrics({
     if (gameState === "NOT_STARTED") setGameState("RUNNING");
 
     const key = toKey(word);
-    if (answerMap[key]) {
+    if (key in answerMap) {
       const correctIndices = [...answerMap[key]!];
 
       setLastCorrect(new Set(correctIndices));
+      setGuessedWords(new Set());
 
       setIsCorrect((draft) => {
         correctIndices.forEach((index) => {
@@ -90,6 +101,11 @@ export default function GuessTheLyrics({
         setGameState("ENDED");
         setShowWinDialog(true);
       }
+    } else if (key in wordsMap) {
+      const guessedIndices = [...wordsMap[key]!];
+      setLastCorrect(new Set());
+      setGuessedWords(new Set(guessedIndices));
+      setCurrentWord(word);
     } else {
       setCurrentWord(word);
     }
@@ -195,17 +211,17 @@ export default function GuessTheLyrics({
           {answerArray.map((word, index) => (
             <span
               key={index}
-              className={cn(
-                gameState === "ENDED" && !isCorrect[index]
-                  ? "text-red-500"
-                  : gameState !== "ENDED" && lastCorrect.has(index)
-                  ? "text-green-500"
-                  : null
-              )}
+              className={cn({
+                "text-red-500": gameState === "ENDED" && !isCorrect[index],
+                "text-green-500":
+                  gameState !== "ENDED" && lastCorrect.has(index),
+                "text-yellow-500":
+                  gameState !== "ENDED" && guessedWords.has(index),
+              })}
             >
               {gameState === "ENDED" || isCorrect[index]
-                ? word + " "
-                : "_".repeat(word.length) + " "}
+                ? word
+                : "_".repeat(word.length)}{" "}
             </span>
           ))}
         </p>
