@@ -15,6 +15,9 @@ export default function WordDisplay({
   isLastCorrectWord,
   isGuessedWord,
 }: WordDisplayProps) {
+  if (word === "\n") {
+    return <br />;
+  }
   return (
     <span
       className={cn({

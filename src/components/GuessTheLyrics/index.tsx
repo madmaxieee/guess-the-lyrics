@@ -11,7 +11,6 @@ import { Input } from "@/components/ui/input";
 import { api } from "@/utils/api";
 import { MIN_PLAYTIME_SECONDS } from "@/utils/constants";
 import { type RouterOutput } from "@/utils/routerTypes";
-import { cn } from "@/utils/ui";
 
 import Timer from "./Timer";
 import WordDisplay from "./WordDisplay";
@@ -35,12 +34,28 @@ export default function GuessTheLyrics({
   const [showWinDialog, setShowWinDialog] = useState(false);
   const [hideInfo, setHideInfo] = useState(initialHideInfo ?? false);
 
-  const answerArray = useMemo(() => lyrics.split(/\s+/), [lyrics]);
-  const totalWords = useMemo(() => answerArray.length, [answerArray]);
+  const answerArray = useMemo(
+    () =>
+      lyrics
+        .split("\n")
+        .reduce((acc, line) => {
+          const words = line.split(" ");
+          words.push("\n");
+          acc.push(...words);
+          return acc;
+        }, [] as string[])
+        .filter((w) => w !== ""),
+    [lyrics]
+  );
+  const totalWords = useMemo(
+    () => answerArray.filter((w) => w !== "\n").length,
+    [answerArray]
+  );
   const wordsMap = useMemo(() => {
     const map: Record<string, number[]> = {};
     answerArray.forEach((word, index) => {
       const key = toKey(word);
+      if (key === "") return;
       map[key] ??= [];
       map[key]!.push(index);
     });
@@ -50,6 +65,7 @@ export default function GuessTheLyrics({
     const map: Record<string, number[]> = {};
     answerArray.forEach((word, index) => {
       const key = toKey(word);
+      if (key === "") return;
       map[key] ??= [];
       map[key]!.push(index);
     });
@@ -81,6 +97,7 @@ export default function GuessTheLyrics({
     if (gameState === "NOT_STARTED") setGameState("RUNNING");
 
     const key = toKey(word);
+
     if (key in answerMap) {
       const correctIndices = [...answerMap[key]!];
 
@@ -207,8 +224,7 @@ export default function GuessTheLyrics({
             className="hidden grow text-xl max-md:block max-md:w-4/5"
           />
         </div>
-
-        <p className="font-mono text-xl text-gray-500 max-md:mx-2">
+        <p className="text-center font-mono text-xl text-gray-500 max-md:mx-2">
           {answerArray.map((word, index) => (
             <WordDisplay
               key={index}
