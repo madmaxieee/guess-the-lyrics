@@ -1,18 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Skeleton } from "../ui/skeleton";
-import { DialogDescription } from "@radix-ui/react-dialog";
 import { Eye, EyeOff } from "lucide-react";
 import { useImmer } from "use-immer";
 
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { api } from "@/utils/api";
 import { MIN_PLAYTIME_SECONDS } from "@/utils/constants";
 import { type RouterOutput } from "@/utils/routerTypes";
 
 import Timer from "./Timer";
+import WinDialog from "./WinDialog";
 import WordDisplay from "./WordDisplay";
 
 type GuessTheLyricsProps = {
@@ -95,6 +94,8 @@ export default function GuessTheLyrics({
 
   const updateCurrentWord = (word: string) => {
     if (gameState === "NOT_STARTED") setGameState("RUNNING");
+
+    setShowWinDialog(true);
 
     const key = toKey(word);
 
@@ -237,14 +238,11 @@ export default function GuessTheLyrics({
           ))}
         </p>
       </div>
-      <Dialog open={showWinDialog} onOpenChange={setShowWinDialog}>
-        <DialogContent>
-          <DialogTitle className="text-3xl">You win!</DialogTitle>
-          <DialogDescription className="text-xl">
-            {`Now you can brag about your score to your friends! You are a true ${artist} fan!`}
-          </DialogDescription>
-        </DialogContent>
-      </Dialog>
+      <WinDialog
+        showWinDialog={showWinDialog}
+        setShowWinDialog={setShowWinDialog}
+        artist={artist ?? ""}
+      />
     </>
   );
 }
