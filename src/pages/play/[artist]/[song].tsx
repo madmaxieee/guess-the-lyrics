@@ -19,7 +19,12 @@ export default function GamePage() {
     <>
       <Head>
         <title>{`guess the lyrics. | ${songData.data?.title ?? ""}`}</title>
-        <SEO />
+        {/* make into server component */}
+        <SEO
+          title={songData.data?.title}
+          artist={songData.data?.artist}
+          coverPhotoUrl={songData.data?.coverPhotoURL}
+        />
       </Head>
       <Layout>
         {songData.isLoading ? (
