@@ -59,7 +59,6 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>guess the lyrics.</title>
         <SEO />
       </Head>
       <Image
