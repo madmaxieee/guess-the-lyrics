@@ -67,7 +67,7 @@
     "dotenv": "^16.3.1",
     "drizzle-kit": "^0.19.13",
     "eslint": "^8.40.0",
-    "eslint-config-next": "^13.4.2",
+    "eslint-config-next": "^14.2.1",
     "postcss": "^8.4.27",
     "prettier": "^2.8.8",
     "prettier-plugin-tailwindcss": "^0.2.8",
