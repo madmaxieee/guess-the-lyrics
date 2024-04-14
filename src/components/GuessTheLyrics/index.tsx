@@ -38,7 +38,7 @@ export default function GuessTheLyrics({
       lyrics
         .split("\n")
         .reduce((acc, line) => {
-          const words = line.split(" ");
+          const words = line.split(/\s+/);
           words.push("\n");
           acc.push(...words);
           return acc;
