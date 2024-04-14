@@ -21,7 +21,7 @@ export const lyricsRouter = createTRPCRouter({
   search: publicProcedure
     .input(z.object({ query: z.string(), topN: z.number().max(20).default(5) }))
     .mutation(async ({ input }) => {
-      if (input.query === "") return null;
+      if (input.query === "") return [];
 
       const { success } = await ratelimit.search.limit("search");
       if (!success) {

@@ -10,7 +10,7 @@ type DuckDuckGoResultItem = {
 };
 
 export async function search(query: string) {
-  const cleanedQuery = query.trim().replaceAll(/\s/g, "+");
+  const cleanedQuery = encodeURIComponent(query);
   const url = `https://lite.duckduckgo.com/lite/?q=${cleanedQuery}`;
   const html = await fetchScrape(url);
   return new DuckDuckGoResult(url, html);

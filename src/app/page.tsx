@@ -1,66 +1,35 @@
-"use client";
+import { Suspense } from "react";
 
-import { useEffect, useRef, useState } from "react";
-
-import Head from "next/head";
+import { revalidatePath } from "next/cache";
 import Image from "next/image";
+import { redirect } from "next/navigation";
 
 import bannerImage from "@/assets/banner.svg";
-import SEO from "@/components/SEO";
-import SearchResult, { SearchResultSkeleton } from "@/components/SearchResult";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
+import { SearchResultSkeleton } from "@/components/SearchResult";
 import { Separator } from "@/components/ui/separator";
-import { api } from "@/trpc/react";
 
-const RESULT_LIMIT = 8;
+import SearchBar from "./_components/SearchBar";
+import SearchResults from "./_components/SearchResults";
 
-export default function Home() {
-  const [searchMode, setSearchMode] = useState<"songs" | "artists">("songs");
-  const searchSongs = api.lyrics.search.useMutation();
-  const searchArtists = api.artist.search.useMutation();
-  const searchMutation = searchMode === "songs" ? searchSongs : searchArtists;
+type SearchMode = "songs" | "artists";
 
-  const searchBoxRef = useRef<HTMLInputElement>(null);
-
-  const search = () => {
-    if (searchMutation.isPending) {
-      return;
-    }
-    const query = searchBoxRef.current?.value;
-    if (query) {
-      searchMutation.mutate({ query, topN: RESULT_LIMIT });
-
-      if (searchMutation.isIdle) {
-        searchMutation.mutate({
-          query,
-          topN: RESULT_LIMIT,
-        });
-      }
-    }
+export default function Home({
+  searchParams: { searchMode = "songs", query = "" },
+}) {
+  const search = async (query: string, searchMode: SearchMode) => {
+    "use server";
+    revalidatePath("/");
+    redirect(
+      `/?query=${encodeURIComponent(query)}&mode=${encodeURIComponent(
+        searchMode
+      )}`
+    );
   };
-
-  const onEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      search();
-    }
-  };
-
-  useEffect(() => {
-    searchBoxRef.current?.focus();
-  }, []);
-
+  if (searchMode !== "songs" && searchMode !== "artists") {
+    searchMode = "songs";
+  }
   return (
     <>
-      <Head>
-        <SEO />
-      </Head>
       <Image
         priority
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -69,59 +38,21 @@ export default function Home() {
         alt="Are you a real fan? guess the lyrics!"
       />
       <div className="mx-auto my-8 w-full max-w-4xl text-xl max-md:px-6">
-        <div className="my-6 flex justify-center gap-4">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="w-16">
-                {searchMode}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="center">
-              <DropdownMenuItem onClick={() => setSearchMode("songs")}>
-                songs
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSearchMode("artists")}>
-                artists
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <Input
-            className="grow md:w-72 md:grow-0"
-            ref={searchBoxRef}
-            onKeyUp={onEnter}
-          />
-          <Button
-            disabled={
-              searchMutation.isPending || searchBoxRef.current?.value === ""
-            }
-            onClick={search}
-          >
-            search
-          </Button>
-        </div>
-        {searchMutation.isPending ? (
-          <ul className="mx-auto flex max-w-2xl flex-col gap-3 max-md:gap-2">
-            {Array.from(Array(RESULT_LIMIT), (_, index) => (
-              <li key={index}>
-                <SearchResultSkeleton />
-                <Separator className="mt-3 max-md:mt-1.5" />
-              </li>
-            ))}
-          </ul>
-        ) : searchMutation.isError ? (
-          <p>Error: {searchMutation.error.message}</p>
-        ) : searchMutation.data?.length === 0 ? (
-          <p>No results</p>
-        ) : searchMutation.data ? (
-          <ul className="mx-auto flex max-w-2xl flex-col gap-3 max-md:gap-2">
-            {searchMutation.data.map((result) => (
-              <li key={result.url}>
-                <SearchResult variation={searchMode} result={result} />
-                <Separator className="mt-3 max-md:mt-1.5" />
-              </li>
-            ))}
-          </ul>
-        ) : null}
+        <SearchBar search={search} defaultValue={query} />
+        <Suspense
+          fallback={
+            <ul className="mx-auto flex max-w-2xl flex-col gap-3 max-md:gap-2">
+              {Array.from(Array(10), (_, index) => (
+                <li key={index}>
+                  <SearchResultSkeleton />
+                  <Separator className="mt-3 max-md:mt-1.5" />
+                </li>
+              ))}
+            </ul>
+          }
+        >
+          <SearchResults searchMode={searchMode as SearchMode} query={query} />
+        </Suspense>
       </div>
     </>
   );
