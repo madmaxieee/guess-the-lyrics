@@ -8,7 +8,7 @@ import { TRPCError } from "@trpc/server";
 import db from "@/db";
 import redis from "@/db/redis";
 import { songs_select } from "@/db/schema";
-import { env } from "@/env.mjs";
+import { env } from "@/env";
 import { ratelimit } from "@/server/api/ratelimit";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import {
@@ -16,7 +16,7 @@ import {
   SESSION_EXPIRE_SECONDS,
 } from "@/utils/constants";
 
-import { lyricsRouterCaller } from "./lyrics";
+import { lyricsCaller } from "./lyrics";
 
 const RANDOM_GAME_TTL = 60 * 60 * 24 * 7; // 1 week
 const RANDOM_GAME_ID_PREFIX = "randomGameID:";
@@ -119,7 +119,7 @@ export const gameRouter = createTRPCRouter({
         });
       }
 
-      const songData = await lyricsRouterCaller.fromAZpath({
+      const songData = await lyricsCaller.fromAZpath({
         path: randomSongPath,
       });
       if (!songData) {
@@ -147,7 +147,14 @@ export const gameRouter = createTRPCRouter({
   count: publicProcedure
     .input(z.object({ path: z.string().regex(/[a-z0-9\-]+\/[a-z0-9\-]+/) }))
     .mutation(async ({ input, ctx }) => {
-      const gameSessionJWT = ctx.cookies.gameSessionJWT;
+      if (ctx.cookies === null) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "No cookies",
+        });
+      }
+
+      const gameSessionJWT = ctx.cookies.get("gameSessionJWT")?.value;
       if (!gameSessionJWT) {
         throw new TRPCError({
           code: "BAD_REQUEST",

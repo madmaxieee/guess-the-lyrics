@@ -1,10 +1,12 @@
+"use client";
+
 import type { MouseEventHandler } from "react";
 
 import { Share } from "lucide-react";
-import { useRouter } from "next/router";
+import { usePathname } from "next/navigation";
 
 import { useToast } from "@/components/ui/use-toast";
-import { env } from "@/env.mjs";
+import { env } from "@/env";
 import isMobileUserAgent from "@/utils/isMobileUserAgent";
 
 import { Button } from "./ui/button";
@@ -14,10 +16,10 @@ type ShareButtonProps = {
 };
 
 export const ShareButton = ({ title }: ShareButtonProps) => {
-  const router = useRouter();
+  const pathname = usePathname();
   const { toast } = useToast();
 
-  const fullPath = `${env.NEXT_PUBLIC_DOMAIN}${router.asPath}`;
+  const fullPath = `${env.NEXT_PUBLIC_DOMAIN}${pathname}`;
   const handleClick: MouseEventHandler = () => {
     if (navigator.share && isMobileUserAgent(navigator.userAgent)) {
       navigator

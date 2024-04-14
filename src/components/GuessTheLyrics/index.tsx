@@ -6,7 +6,7 @@ import { useImmer } from "use-immer";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { api } from "@/utils/api";
+import { api } from "@/trpc/react";
 import { MIN_PLAYTIME_SECONDS } from "@/utils/constants";
 import { type RouterOutput } from "@/utils/routerTypes";
 

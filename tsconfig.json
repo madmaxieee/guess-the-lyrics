@@ -41,7 +41,7 @@
     "**/*.cjs",
     "**/*.mjs",
     ".next/types/**/*.ts"
-  ],
+, "src/env.js"  ],
   "exclude": [
     "node_modules"
   ]

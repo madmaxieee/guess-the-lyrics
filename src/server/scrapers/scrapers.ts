@@ -2,7 +2,7 @@ import { HttpsProxyAgent } from "https-proxy-agent";
 import fetch from "node-fetch";
 import puppeteer, { type Browser } from "puppeteer-core";
 
-import { env } from "@/env.mjs";
+import { env } from "@/env";
 
 import { userAgent } from "./userAgent";
 

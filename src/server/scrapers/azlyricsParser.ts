@@ -1,6 +1,6 @@
 import { JSDOM } from "jsdom";
 
-import { env } from "@/env.mjs";
+import { env } from "@/env";
 import { songurl2path } from "@/utils/client";
 
 import { BlockExternalResourceLoader } from "./resourceLoader";

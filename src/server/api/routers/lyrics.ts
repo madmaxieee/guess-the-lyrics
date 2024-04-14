@@ -7,7 +7,12 @@ import db from "@/db";
 import { songs_insert } from "@/db/_schema";
 import { songs_select } from "@/db/schema";
 import { ratelimit } from "@/server/api/ratelimit";
-import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
+import {
+  createCallerFactory,
+  createTRPCContext,
+  createTRPCRouter,
+  publicProcedure,
+} from "@/server/api/trpc";
 import { type SongData, fetchSongData } from "@/server/scrapers/azlyricsParser";
 import { search } from "@/server/scrapers/duckduckgo";
 import { songpath2url } from "@/utils/client";
@@ -152,9 +157,10 @@ export const lyricsRouter = createTRPCRouter({
     }),
 });
 
-export const lyricsRouterCaller = lyricsRouter.createCaller({
-  cookies: {},
-  setCookie: (_key, _value, _opts) => {
-    throw new Error("cannot set cookies in backend code");
-  },
-});
+const createLyricsCaller = createCallerFactory(lyricsRouter);
+export const lyricsCaller = createLyricsCaller(() =>
+  createTRPCContext({
+    headers: null,
+    cookies: null,
+  })
+);

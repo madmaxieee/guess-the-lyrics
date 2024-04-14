@@ -2,10 +2,10 @@ import React, { useEffect } from "react";
 
 import { Shuffle } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 import { type ArtistData } from "@/server/scrapers/azlyricsParser";
-import { api } from "@/utils/api";
+import { api } from "@/trpc/react";
 
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
@@ -22,9 +22,7 @@ export default function AlbumDisplay({ album, artistKey }: AlbumDisplayProps) {
 
   useEffect(() => {
     if (createRandomGame.isSuccess) {
-      router
-        .push(`/play/random/${createRandomGame.data.randomGameID}`)
-        .catch(console.error);
+      router.push(`/play/random/${createRandomGame.data.randomGameID}`);
     }
   }, [createRandomGame.data?.randomGameID, createRandomGame.isSuccess, router]);
 
@@ -46,7 +44,7 @@ export default function AlbumDisplay({ album, artistKey }: AlbumDisplayProps) {
             size="icon"
             className="hidden max-md:inline-flex"
             variant="secondary"
-            disabled={createRandomGame.isLoading}
+            disabled={createRandomGame.isPending}
             onClick={() =>
               createRandomGame.mutate({
                 artistKey,
@@ -63,7 +61,7 @@ export default function AlbumDisplay({ album, artistKey }: AlbumDisplayProps) {
             size="icon"
             className="hidden md:inline-flex"
             variant="secondary"
-            disabled={createRandomGame.isLoading}
+            disabled={createRandomGame.isPending}
             onClick={() =>
               createRandomGame.mutate({
                 artistKey,
