@@ -5,6 +5,7 @@ import { Roboto_Mono } from "next/font/google";
 
 import { Analytics } from "@vercel/analytics/react";
 
+import { Toaster } from "@/components/ui/toaster";
 import { api } from "@/utils/api";
 
 const robotoMono = Roboto_Mono({
@@ -21,6 +22,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
         <div className={robotoMono.variable}>
           <Component {...pageProps} />
         </div>
+        <Toaster />
       </NextThemesProvider>
       <Analytics />
     </>

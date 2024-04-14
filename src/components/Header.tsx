@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { ShareButton } from "./ShareButton";
 import ThemeToggle from "./ThemeToggle";
 import { Separator } from "./ui/separator";
 
@@ -10,7 +11,10 @@ export default function Header() {
         <Link href="/">
           <h2 className="text-lg font-semibold">guess the lyrics.</h2>
         </Link>
-        <ThemeToggle />
+        <div className="flex gap-2">
+          <ShareButton title="guess the lyrics." />
+          <ThemeToggle />
+        </div>
       </div>
       <Separator />
     </>
