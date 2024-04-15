@@ -1,5 +1,5 @@
 import { ratelimit } from "../ratelimit";
-import { and, eq, lt, sql } from "drizzle-orm";
+import { and, eq, gt, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import { TRPCError } from "@trpc/server";
@@ -52,10 +52,8 @@ export const artistRouter = createTRPCRouter({
     }),
 
   fromAZkey: publicProcedure
-    .input(z.object({ key: z.string().min(1).nullish() }))
+    .input(z.object({ key: z.string().min(1) }))
     .query(async ({ input }) => {
-      if (typeof input.key !== "string") return null;
-
       const dbSongList = await db
         .select({
           path: songs_select.path,
@@ -69,7 +67,7 @@ export const artistRouter = createTRPCRouter({
         .where(
           and(
             eq(artists.key, input.key),
-            lt(artists.lastSongListUpdate, sql`datetime('now', '-7 days')`)
+            gt(artists.lastSongListUpdate, sql`datetime('now', '-7 days')`)
           )
         )
         .execute();

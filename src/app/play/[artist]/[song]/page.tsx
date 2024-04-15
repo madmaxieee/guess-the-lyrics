@@ -15,11 +15,6 @@ export default async function GamePage({
 
   try {
     const songData = await api.lyrics.fromAZpath({ path });
-
-    if (songData == null) {
-      return null;
-    }
-
     return (
       <>
         <Head>
