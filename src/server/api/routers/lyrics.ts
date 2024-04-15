@@ -160,7 +160,7 @@ export const lyricsRouter = createTRPCRouter({
 const createLyricsCaller = createCallerFactory(lyricsRouter);
 export const lyricsCaller = createLyricsCaller(() =>
   createTRPCContext({
-    headers: null,
-    cookies: null,
+    req: null,
+    resHeaders: null,
   })
 );

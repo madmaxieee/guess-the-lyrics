@@ -6,6 +6,7 @@
  * TL;DR - This is where all the tRPC server stuff is created and plugged in. The pieces you will
  * need to use are documented accordingly near the end.
  */
+import { type CookieSerializeOptions, serialize } from "cookie";
 import type { NextRequest } from "next/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
@@ -24,31 +25,30 @@ import { initTRPC } from "@trpc/server";
  *
  * @see https://trpc.io/docs/server/context
  */
-export const createTRPCContext = (_opts: {
-  headers: Headers | null;
-  cookies: NextRequest["cookies"] | null;
+export const createTRPCContext = (opts: {
+  req: NextRequest | null;
+  resHeaders: Headers | null;
 }) => {
-  return {
-    setCookie: (
-      key: string,
-      value: string,
-      opts: {
-        maxAge?: number;
-        path?: string;
-        httpOnly?: boolean;
+  const cookies = {
+    get: (name: string) => opts.req?.cookies?.get(name),
+    has: (name: string) => opts.req?.cookies?.has(name),
+    set: (name: string, value: string, options?: CookieSerializeOptions) => {
+      if (!opts.resHeaders) {
+        throw new Error("resHeaders is not available");
       }
-    ) => {
-      if (!_opts.headers) {
-        return;
-      }
-      _opts.headers.set(
-        "Set-Cookie",
-        `${key}=${value}; Path=${opts.path ?? "/"}; ${
-          opts.httpOnly ? "HttpOnly; " : ""
-        } Max-Age=${opts.maxAge ?? -1}; SameSite=Lax`
-      );
+      opts.resHeaders.append("Set-Cookie", serialize(name, value, options));
     },
-    ..._opts,
+    clear: (name: string) => {
+      if (!opts.resHeaders) {
+        throw new Error("resHeaders is not available");
+      }
+      opts.resHeaders.append("Set-Cookie", serialize(name, "", { maxAge: -1 }));
+    },
+  };
+  return {
+    headers: opts.req?.headers,
+    resHeaders: opts.resHeaders,
+    cookies,
   };
 };
 

@@ -11,8 +11,8 @@ import { createTRPCContext } from "@/server/api/trpc";
  */
 const createServerContext = cache(() => {
   return createTRPCContext({
-    headers: null,
-    cookies: null,
+    req: null,
+    resHeaders: null,
   });
 });
 

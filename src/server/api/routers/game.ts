@@ -1,6 +1,7 @@
 import { and, eq, sql } from "drizzle-orm";
 import * as jose from "jose";
 import { nanoid } from "nanoid";
+import { cookies } from "next/headers";
 import { z } from "zod";
 
 import { TRPCError } from "@trpc/server";
@@ -19,7 +20,8 @@ import {
 import { lyricsCaller } from "./lyrics";
 
 const RANDOM_GAME_TTL = 60 * 60 * 24 * 7; // 1 week
-const RANDOM_GAME_ID_PREFIX = "randomGameID:";
+const RANDOM_GAME_ID_PREFIX = "randomGameID:" as const;
+const GAME_SESSION_JWT_COOKIE = "gameSessionJWT" as const;
 
 export const gameRouter = createTRPCRouter({
   createRandom: publicProcedure
@@ -137,9 +139,9 @@ export const gameRouter = createTRPCRouter({
 
   start: publicProcedure
     .input(z.object({ path: z.string().regex(/[a-z0-9\-]+\/[a-z0-9\-]+/) }))
-    .mutation(async ({ input, ctx }) => {
+    .mutation(async ({ input }) => {
       const jwt = await signJWT({ path: input.path });
-      ctx.setCookie("gameSessionJWT", jwt, {
+      cookies().set(GAME_SESSION_JWT_COOKIE, jwt, {
         maxAge: SESSION_EXPIRE_SECONDS * 1000,
       });
     }),
@@ -154,7 +156,7 @@ export const gameRouter = createTRPCRouter({
         });
       }
 
-      const gameSessionJWT = ctx.cookies.get("gameSessionJWT")?.value;
+      const gameSessionJWT = ctx.cookies.get(GAME_SESSION_JWT_COOKIE)?.value;
       if (!gameSessionJWT) {
         throw new TRPCError({
           code: "BAD_REQUEST",
@@ -213,19 +215,20 @@ const audience = "guess-the-lyrics.vercel.app" as const;
 async function signJWT(payload: Record<string, unknown>) {
   const jwt = await new jose.SignJWT(payload)
     .setProtectedHeader({ alg })
-    .setIssuedAt()
     .setIssuer(issuer)
     .setAudience(audience)
+    .setIssuedAt()
     .setExpirationTime("1h")
     .sign(secret);
+
   return jwt;
 }
 
 const GameSessionJWTSchema = z.object({
   path: z.string(),
-  iat: z.number(),
   iss: z.literal("guess-the-lyrics.vercel.app"),
   aud: z.literal("guess-the-lyrics.vercel.app"),
+  iat: z.number(),
   exp: z.number(),
 });
 
@@ -237,9 +240,6 @@ async function verifyJWT(jwt: string) {
     audience,
   });
   const safePayload = GameSessionJWTSchema.parse(payload);
-  if (safePayload.exp * 1000 < Date.now()) {
-    throw new Error("Token expired");
-  }
   return {
     payload: safePayload,
     protectedHeader,
