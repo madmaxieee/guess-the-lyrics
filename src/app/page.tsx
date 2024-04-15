@@ -28,6 +28,7 @@ export default function Home({
   if (searchMode !== "songs" && searchMode !== "artists") {
     searchMode = "songs";
   }
+  // TODO: use from action to show better loading state
   return (
     <>
       <Image
