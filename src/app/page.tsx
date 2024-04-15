@@ -14,7 +14,7 @@ import SearchResults from "./_components/SearchResults";
 type SearchMode = "songs" | "artists";
 
 export default function Home({
-  searchParams: { searchMode = "songs", query = "" },
+  searchParams: { mode: searchMode = "songs", query = "" },
 }) {
   const search = async (query: string, searchMode: SearchMode) => {
     "use server";
@@ -39,7 +39,11 @@ export default function Home({
         alt="Are you a real fan? guess the lyrics!"
       />
       <div className="mx-auto my-8 w-full max-w-4xl text-xl max-md:px-6">
-        <SearchBar search={search} defaultValue={query} />
+        <SearchBar
+          search={search}
+          defaultMode={searchMode as SearchMode}
+          defaultQuery={query}
+        />
         <Suspense
           fallback={
             <ul className="mx-auto flex max-w-2xl flex-col gap-3 max-md:gap-2">

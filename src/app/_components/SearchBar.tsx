@@ -14,11 +14,16 @@ import { Input } from "@/components/ui/input";
 type SearchMode = "songs" | "artists";
 type SearchBarProps = {
   search: (query: string, searchMode: SearchMode) => Promise<void>;
-  defaultValue?: string;
+  defaultMode: SearchMode;
+  defaultQuery: string;
 };
 
-export default function SearchBar({ search, defaultValue }: SearchBarProps) {
-  const [searchMode, setSearchMode] = useState<SearchMode>("songs");
+export default function SearchBar({
+  search,
+  defaultMode,
+  defaultQuery,
+}: SearchBarProps) {
+  const [searchMode, setSearchMode] = useState<SearchMode>(defaultMode);
   const searchBoxRef = useRef<HTMLInputElement>(null);
 
   const handleSearch = () => {
@@ -30,6 +35,10 @@ export default function SearchBar({ search, defaultValue }: SearchBarProps) {
   useEffect(() => {
     searchBoxRef.current?.focus();
   }, []);
+
+  useEffect(() => {
+    setSearchMode(defaultMode);
+  }, [defaultMode]);
 
   return (
     <div className="my-6 flex justify-center gap-4">
@@ -52,7 +61,7 @@ export default function SearchBar({ search, defaultValue }: SearchBarProps) {
         className="grow md:w-72 md:grow-0"
         ref={searchBoxRef}
         onKeyUp={(e) => e.key === "Enter" && handleSearch()}
-        defaultValue={defaultValue}
+        defaultValue={defaultQuery}
       />
       <Button onClick={handleSearch}>search</Button>
     </div>
