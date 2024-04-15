@@ -61,7 +61,7 @@ export const gameRouter = createTRPCRouter({
                 )
               : eq(songs_select.artistKey, input.artistKey)
           )
-          .orderBy(sql`RAND()`)
+          .orderBy(sql`random()`)
           .limit(1)
           .execute();
 
@@ -79,7 +79,7 @@ export const gameRouter = createTRPCRouter({
             path: songs_select.path,
           })
           .from(songs_select)
-          .orderBy(sql`RAND()`)
+          .orderBy(sql`random()`)
           .limit(1)
           .execute();
 

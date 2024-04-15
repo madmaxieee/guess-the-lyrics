@@ -52,17 +52,8 @@ export const lyricsRouter = createTRPCRouter({
     }),
 
   fromAZpath: publicProcedure
-    .input(
-      z.object({
-        path: z
-          .string()
-          .regex(/[a-z0-9\-]+\/[a-z0-9\-]+/)
-          .nullish(),
-      })
-    )
+    .input(z.object({ path: z.string().regex(/[a-z0-9\-]+\/[a-z0-9\-]+/) }))
     .query(async ({ input }) => {
-      if (!input.path) return null;
-
       {
         const { success } = await ratelimit.other.limit("lyrics.fromAZpath");
         if (!success) {

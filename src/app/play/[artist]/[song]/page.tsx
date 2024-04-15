@@ -15,7 +15,6 @@ export default async function GamePage({
 
   try {
     const songData = await api.lyrics.fromAZpath({ path });
-    // const songData = api.mock.songData.useQuery();
 
     if (songData == null) {
       return null;

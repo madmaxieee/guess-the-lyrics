@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Skeleton } from "../ui/skeleton";
 import { Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
 import { useImmer } from "use-immer";
 
 import { Button } from "@/components/ui/button";
@@ -167,9 +168,11 @@ export default function GuessTheLyrics({
                 <h1 className="my-6 text-6xl font-extrabold max-md:my-0 max-md:text-3xl">
                   {title}
                 </h1>
-                <h2 className="text-4xl font-extrabold max-md:text-2xl">
-                  {artist}
-                </h2>
+                <Link href={`/artists/${path.split("/")[0]}`}>
+                  <h2 className="text-4xl font-extrabold underline max-md:text-2xl">
+                    {artist}
+                  </h2>
+                </Link>
                 <p className="text-3xl max-md:text-xl">{album}</p>
               </div>
             </>

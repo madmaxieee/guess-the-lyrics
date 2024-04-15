@@ -1,5 +1,5 @@
 import { ratelimit } from "../ratelimit";
-import { and, eq, gt, sql } from "drizzle-orm";
+import { and, eq, lt, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import { TRPCError } from "@trpc/server";
@@ -69,7 +69,7 @@ export const artistRouter = createTRPCRouter({
         .where(
           and(
             eq(artists.key, input.key),
-            gt(artists.lastSongListUpdate, sql`datetime('now', '-90 days')`)
+            lt(artists.lastSongListUpdate, sql`datetime('now', '-7 days')`)
           )
         )
         .execute();
@@ -121,24 +121,24 @@ export const artistRouter = createTRPCRouter({
         }
       }
 
-      db.transaction(async (tx) => {
-        await tx
-          .insert(songs_insert)
-          .values(valuesToInsert)
-          .onConflictDoNothing();
-        await tx
-          .insert(artists)
-          .values({
-            key: input.key!,
+      db.insert(songs_insert)
+        .values(valuesToInsert)
+        .onConflictDoNothing()
+        .execute()
+        .catch(console.error);
+      db.insert(artists)
+        .values({
+          key: input.key,
+          lastSongListUpdate: sql`CURRENT_TIMESTAMP`,
+        })
+        .onConflictDoUpdate({
+          target: artists.key,
+          set: {
             lastSongListUpdate: sql`CURRENT_TIMESTAMP`,
-          })
-          .onConflictDoUpdate({
-            target: artists.key,
-            set: {
-              lastSongListUpdate: sql`CURRENT_TIMESTAMP`,
-            },
-          });
-      }).catch(console.error);
+          },
+        })
+        .execute()
+        .catch(console.error);
 
       return artistData;
     }),
