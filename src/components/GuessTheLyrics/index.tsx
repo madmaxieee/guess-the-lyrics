@@ -95,8 +95,6 @@ export default function GuessTheLyrics({
   const updateCurrentWord = (word: string) => {
     if (gameState === "NOT_STARTED") setGameState("RUNNING");
 
-    setShowWinDialog(true);
-
     const key = toKey(word);
 
     if (key in answerMap) {

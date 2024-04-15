@@ -27,7 +27,6 @@ export default function GamePage() {
           coverPhotoUrl={songData.data?.coverPhotoURL}
         />
       </Head>
-
       {songData.isLoading ? (
         <GuessTheLyricsSkeleton />
       ) : songData.isError ? (
