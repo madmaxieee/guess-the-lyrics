@@ -1,4 +1,4 @@
-import ConfettiExplosion from "react-confetti-explosion";
+import Confetti from "../Confetti";
 
 import {
   Dialog,
@@ -25,14 +25,10 @@ export default function WinDialog({
           <DialogTitle className="text-3xl">You win!</DialogTitle>
           <DialogDescription className="text-xl">
             {`Now you can brag about your score to your friends! You are a true ${artist} fan!`}
-            <div className="mx-auto w-0">
-              {showWinDialog && (
-                <ConfettiExplosion zIndex={1000} duration={3000} />
-              )}
-            </div>
           </DialogDescription>
         </DialogContent>
       </Dialog>
+      {showWinDialog && <Confetti />}
     </>
   );
 }

@@ -1,4 +1,7 @@
+"use client";
+
 import { useEffect, useMemo, useRef, useState } from "react";
+import ConfettiExplosion from "react-confetti-explosion";
 
 import { Skeleton } from "../ui/skeleton";
 import { Eye, EyeOff } from "lucide-react";
