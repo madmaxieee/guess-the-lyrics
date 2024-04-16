@@ -189,7 +189,7 @@ export const gameRouter = createTRPCRouter({
         });
       }
 
-      if (env.NODE_ENV !== "production") return;
+      if (process.env.NODE_ENV !== "production") return;
 
       try {
         await db

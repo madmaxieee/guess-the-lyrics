@@ -1,6 +1,5 @@
 import { JSDOM } from "jsdom";
 
-import { env } from "@/env";
 import { songurl2path } from "@/utils/client";
 
 import { BlockExternalResourceLoader } from "./resourceLoader";
@@ -15,7 +14,8 @@ export type SongData = {
   coverPhotoURL: string | null;
 };
 
-const scrape = env.NODE_ENV === "production" ? proxyScrape : fetchScrape;
+const scrape =
+  process.env.NODE_ENV === "production" ? proxyScrape : fetchScrape;
 
 export async function fetchSongData(url: string): Promise<SongData> {
   if (
