@@ -1,11 +1,11 @@
-import { eq } from "drizzle-orm";
+import { and, eq, gt, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import { TRPCError } from "@trpc/server";
 
 import db from "@/db";
 import { songs_insert } from "@/db/_schema";
-import { songs_select } from "@/db/schema";
+import { songs_select, search_cache } from "@/db/schema";
 import { ratelimit } from "@/server/api/ratelimit";
 import {
   createCallerFactory,
@@ -22,6 +22,22 @@ export const lyricsRouter = createTRPCRouter({
     .input(z.object({ query: z.string(), topN: z.number().max(20).default(5) }))
     .mutation(async ({ input }) => {
       if (input.query === "") return [];
+
+      const [cachedResults] = await db
+        .select({
+          results: search_cache.results,
+        })
+        .from(search_cache)
+        .where(
+          and(
+            eq(search_cache.query, input.query),
+            gt(search_cache.lastUpdate, sql`datetime('now', '-7 days')`)
+          )
+        )
+        .execute();
+      if (cachedResults?.results) {
+        return cachedResults.results;
+      }
 
       const { success } = await ratelimit.search.limit("search");
       if (!success) {
@@ -48,6 +64,24 @@ export const lyricsRouter = createTRPCRouter({
           .trim(),
         url: item.url,
       }));
+
+      db.insert(search_cache)
+        .values({
+          query: input.query,
+          searchMode: "songs",
+          results: topTitleUrl,
+          lastUpdate: sql`CURRENT_TIMESTAMP`,
+        })
+        .onConflictDoUpdate({
+          target: search_cache.query,
+          set: {
+            results: topTitleUrl,
+            lastUpdate: sql`CURRENT_TIMESTAMP`,
+          },
+        })
+        .execute()
+        .catch(console.error);
+
       return topTitleUrl;
     }),
 

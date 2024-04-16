@@ -19,7 +19,7 @@ export const artistRouter = createTRPCRouter({
   search: publicProcedure
     .input(z.object({ query: z.string(), topN: z.number().max(20).default(5) }))
     .mutation(async ({ input }) => {
-      if (input.query === "") return null;
+      if (input.query === "") return [];
 
       const { success } = await ratelimit.search.limit("search");
       if (!success) {
@@ -67,7 +67,7 @@ export const artistRouter = createTRPCRouter({
         .where(
           and(
             eq(artists.key, input.key),
-            gt(artists.lastSongListUpdate, sql`datetime('now', '-7 days')`)
+            gt(artists.lastSongListUpdate, sql`datetime('now', '-30 days')`)
           )
         )
         .execute();
