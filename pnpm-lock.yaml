@@ -25,7 +25,7 @@ dependencies:
     version: 1.1.5(@types/react-dom@18.2.25)(@types/react@18.2.78)(react-dom@18.2.0)(react@18.2.0)
   '@t3-oss/env-nextjs':
     specifier: ^0.3.1
-    version: 0.3.1(typescript@5.4.5)(zod@3.21.4)
+    version: 0.3.1(typescript@5.4.5)(zod@3.22.3)
   '@tanstack/react-query':
     specifier: ^5.29.2
     version: 5.29.2(react@18.2.0)
@@ -67,7 +67,7 @@ dependencies:
     version: 0.30.8(@libsql/client@0.5.6)(@types/react@18.2.78)(react@18.2.0)
   drizzle-zod:
     specifier: ^0.5.0
-    version: 0.5.0(drizzle-orm@0.30.8)(zod@3.21.4)
+    version: 0.5.0(drizzle-orm@0.30.8)(zod@3.22.3)
   https-proxy-agent:
     specifier: ^7.0.1
     version: 7.0.1
@@ -126,8 +126,8 @@ dependencies:
     specifier: ^9.0.0
     version: 9.0.0
   zod:
-    specifier: ^3.21.4
-    version: 3.21.4
+    specifier: ^3.22.3
+    version: 3.22.3
 
 devDependencies:
   '@trivago/prettier-plugin-sort-imports':
@@ -1760,25 +1760,25 @@ packages:
       tslib: 2.6.2
     dev: false
 
-  /@t3-oss/env-core@0.3.1(typescript@5.4.5)(zod@3.21.4):
+  /@t3-oss/env-core@0.3.1(typescript@5.4.5)(zod@3.22.3):
     resolution: {integrity: sha512-iEnBuWeSjzqQLDTUw7H+YhstV4OZrGXTkQGL6ZOMxZQoCmwGX7GVS+1KCd5RvCzOtrIAD9jeOItSWNjC7sG4Sg==}
     peerDependencies:
       typescript: '>=4.7.2'
       zod: ^3.0.0
     dependencies:
       typescript: 5.4.5
-      zod: 3.21.4
+      zod: 3.22.3
     dev: false
 
-  /@t3-oss/env-nextjs@0.3.1(typescript@5.4.5)(zod@3.21.4):
+  /@t3-oss/env-nextjs@0.3.1(typescript@5.4.5)(zod@3.22.3):
     resolution: {integrity: sha512-W1OgOn5xtpdEGraAQesyLzO2aNLRfSJEyK6qjQFfEUnrPbkvB+WxABX2bPMqfn4KJQ8pziLCSdBFiUN8OagqAg==}
     peerDependencies:
       typescript: '>=4.7.2'
       zod: ^3.0.0
     dependencies:
-      '@t3-oss/env-core': 0.3.1(typescript@5.4.5)(zod@3.21.4)
+      '@t3-oss/env-core': 0.3.1(typescript@5.4.5)(zod@3.22.3)
       typescript: 5.4.5
-      zod: 3.21.4
+      zod: 3.22.3
     dev: false
 
   /@tanstack/query-core@5.29.0:
@@ -2817,7 +2817,7 @@ packages:
       json-diff: 0.9.0
       minimatch: 7.4.6
       semver: 7.6.0
-      zod: 3.21.4
+      zod: 3.22.3
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -2907,14 +2907,14 @@ packages:
       react: 18.2.0
     dev: false
 
-  /drizzle-zod@0.5.0(drizzle-orm@0.30.8)(zod@3.21.4):
+  /drizzle-zod@0.5.0(drizzle-orm@0.30.8)(zod@3.22.3):
     resolution: {integrity: sha512-gIOXclphhaleYFEGZFxSyJBoiPRyksGyIPgmgWz6a+j5JeaOrOf1QOPjf1p5AHYA+1O3Q01ondGOZfgObxBTsg==}
     peerDependencies:
       drizzle-orm: '>=0.23.13'
       zod: '*'
     dependencies:
       drizzle-orm: 0.30.8(@libsql/client@0.5.6)(@types/react@18.2.78)(react@18.2.0)
-      zod: 3.21.4
+      zod: 3.22.3
     dev: false
 
   /eastasianwidth@0.2.0:
@@ -6011,5 +6011,5 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /zod@3.21.4:
-    resolution: {integrity: sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==}
+  /zod@3.22.3:
+    resolution: {integrity: sha512-EjIevzuJRiRPbVH4mGc8nApb/lVLKVpmUhAaR5R5doKGfAnGJ6Gr3CViAVjP+4FWSxCsybeWQdcgCtbX+7oZug==}
