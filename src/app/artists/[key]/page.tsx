@@ -1,16 +1,29 @@
-import React from "react";
+import React, { cache } from "react";
 
-import Head from "next/head";
 import { redirect } from "next/navigation";
 
 import type { TRPCError } from "@trpc/server";
 
 import AlbumDisplay, { AlbumSong } from "@/components/AlbumDisplay";
-import SEO from "@/components/SEO";
 import { Separator } from "@/components/ui/separator";
 import { api } from "@/trpc/server";
+import { makeMetadata } from "@/utils/metadata";
 
 import RandomButton from "./_components/RandomButton";
+
+const getArtistData = cache(async (key: string) => {
+  const artistData = await api.artist.fromAZkey({ key });
+  return artistData;
+});
+
+export async function generateMetadata({
+  params: { key },
+}: {
+  params: { key: string };
+}) {
+  const artistData = await getArtistData(key);
+  return makeMetadata({ artistName: artistData.name });
+}
 
 export default async function ArtistPage({
   params: { key },
@@ -26,14 +39,10 @@ export default async function ArtistPage({
   };
 
   try {
-    const artistData = await api.artist.fromAZkey({ key });
+    const artistData = await getArtistData(key);
 
     return (
       <>
-        <Head>
-          <title>{`guess the lyrics. | ${artistData.name ?? ""}`}</title>
-          <SEO />
-        </Head>
         <div className="mx-auto mb-16 mt-8 w-full max-w-4xl text-xl max-md:mx-1">
           <div className="mb-16 flex justify-between max-md:mb-8 max-md:px-4">
             <h1 className="text-4xl font-bold max-md:text-3xl">

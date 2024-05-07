@@ -1,10 +1,10 @@
-import Head from "next/head";
-
 import type { TRPCError } from "@trpc/server";
 
 import GuessTheLyrics from "@/components/GuessTheLyrics";
-import SEO from "@/components/SEO";
 import { api } from "@/trpc/server";
+import { makeMetadata } from "@/utils/metadata";
+
+export const metadata = makeMetadata({});
 
 export default async function GamePage({
   params: { gameID },
@@ -13,14 +13,7 @@ export default async function GamePage({
 }) {
   try {
     const songData = await api.game.getRandom({ randomGameID: gameID });
-    return (
-      <>
-        <Head>
-          <SEO />
-        </Head>
-        <GuessTheLyrics songData={songData} path={songData.path} hideInfo />
-      </>
-    );
+    return <GuessTheLyrics songData={songData} path={songData.path} hideInfo />;
   } catch (error) {
     console.error(error);
     return (

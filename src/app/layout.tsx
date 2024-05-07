@@ -29,9 +29,6 @@ type RootLayoutProps = {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" className="dark" style={{ colorScheme: "dark" }}>
-      <head>
-        <title>guess the lyrics.</title>
-      </head>
       <body className={cn("flex min-h-screen flex-col", robotoMono.variable)}>
         <Providers>
           <main className="flex grow flex-col items-center">
