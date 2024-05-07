@@ -1,15 +1,16 @@
+"use client";
+
 import React, { useEffect } from "react";
 
 import { Shuffle } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 import { type ArtistData } from "@/server/scrapers/azlyricsParser";
-import { api } from "@/utils/api";
+import { api } from "@/trpc/react";
 
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
-import { Skeleton } from "./ui/skeleton";
 
 type AlbumDisplayProps = {
   album: NonNullable<ArtistData>["albums"][number];
@@ -22,9 +23,7 @@ export default function AlbumDisplay({ album, artistKey }: AlbumDisplayProps) {
 
   useEffect(() => {
     if (createRandomGame.isSuccess) {
-      router
-        .push(`/play/random/${createRandomGame.data.randomGameID}`)
-        .catch(console.error);
+      router.push(`/play/random/${createRandomGame.data.randomGameID}`);
     }
   }, [createRandomGame.data?.randomGameID, createRandomGame.isSuccess, router]);
 
@@ -46,7 +45,7 @@ export default function AlbumDisplay({ album, artistKey }: AlbumDisplayProps) {
             size="icon"
             className="hidden max-md:inline-flex"
             variant="secondary"
-            disabled={createRandomGame.isLoading}
+            disabled={createRandomGame.isPending}
             onClick={() =>
               createRandomGame.mutate({
                 artistKey,
@@ -63,7 +62,7 @@ export default function AlbumDisplay({ album, artistKey }: AlbumDisplayProps) {
             size="icon"
             className="hidden md:inline-flex"
             variant="secondary"
-            disabled={createRandomGame.isLoading}
+            disabled={createRandomGame.isPending}
             onClick={() =>
               createRandomGame.mutate({
                 artistKey,
@@ -95,47 +94,5 @@ export function AlbumSong({
         {title}
       </li>
     </Link>
-  );
-}
-
-export function AlbumDisplaySkeleton() {
-  return (
-    <>
-      <Separator />
-      <div className="grid grid-cols-5">
-        <div className="col-span-2 flex flex-col items-center gap-6 max-md:ml-1.5 max-md:items-start max-md:gap-3">
-          <Skeleton className="h-48 w-48 rounded-lg max-md:h-32 max-md:w-32 max-md:rounded-md" />
-          <Skeleton className="h-8 w-60 max-md:h-6 max-md:w-32" />
-          <Button
-            size="icon"
-            className="hidden max-md:inline-flex"
-            variant="secondary"
-            disabled
-          ></Button>
-        </div>
-
-        <div className="col-span-3 flex gap-3">
-          <Button
-            size="icon"
-            className="hidden md:inline-flex"
-            variant="secondary"
-            disabled
-          ></Button>
-          <ul className="grow">
-            {Array.from(Array(6), (_, index) => (
-              <AlbumSongSkeleton key={index} />
-            ))}
-          </ul>
-        </div>
-      </div>
-    </>
-  );
-}
-
-export function AlbumSongSkeleton() {
-  return (
-    <li className="rounded-lg px-3 py-1.5 max-md:py-1 max-md:text-sm">
-      <Skeleton className="h-8 w-full" />
-    </li>
   );
 }

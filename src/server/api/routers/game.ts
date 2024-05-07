@@ -1,13 +1,15 @@
 import { and, eq, sql } from "drizzle-orm";
+import * as jose from "jose";
 import { nanoid } from "nanoid";
-import { v4 as uuid } from "uuid";
+import { cookies } from "next/headers";
 import { z } from "zod";
 
 import { TRPCError } from "@trpc/server";
 
 import db from "@/db";
 import redis from "@/db/redis";
-import { songs } from "@/db/schema";
+import { songs_select } from "@/db/schema";
+import { env } from "@/env";
 import { ratelimit } from "@/server/api/ratelimit";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import {
@@ -15,10 +17,11 @@ import {
   SESSION_EXPIRE_SECONDS,
 } from "@/utils/constants";
 
-import { lyricsRouterCaller } from "./lyrics";
+import { lyricsCaller } from "./lyrics";
 
 const RANDOM_GAME_TTL = 60 * 60 * 24 * 7; // 1 week
-const RANDOM_GAME_ID_PREFIX = "randomGameID:";
+const RANDOM_GAME_ID_PREFIX = "randomGameID:" as const;
+const GAME_SESSION_JWT_COOKIE = "gameSessionJWT" as const;
 
 export const gameRouter = createTRPCRouter({
   createRandom: publicProcedure
@@ -47,18 +50,18 @@ export const gameRouter = createTRPCRouter({
       if (input.artistKey) {
         const [randomSong] = await db
           .select({
-            path: songs.path,
+            path: songs_select.path,
           })
-          .from(songs)
+          .from(songs_select)
           .where(
             input.album
               ? and(
-                  eq(songs.artistKey, input.artistKey),
-                  eq(songs.album, input.album)
+                  eq(songs_select.artistKey, input.artistKey),
+                  eq(songs_select.album, input.album)
                 )
-              : eq(songs.artistKey, input.artistKey)
+              : eq(songs_select.artistKey, input.artistKey)
           )
-          .orderBy(sql`RAND()`)
+          .orderBy(sql`random()`)
           .limit(1)
           .execute();
 
@@ -73,10 +76,10 @@ export const gameRouter = createTRPCRouter({
       } else {
         const [randomSong] = await db
           .select({
-            path: songs.path,
+            path: songs_select.path,
           })
-          .from(songs)
-          .orderBy(sql`RAND()`)
+          .from(songs_select)
+          .orderBy(sql`random()`)
           .limit(1)
           .execute();
 
@@ -107,14 +110,6 @@ export const gameRouter = createTRPCRouter({
   getRandom: publicProcedure
     .input(z.object({ randomGameID: z.string() }))
     .query(async ({ input }) => {
-      const { success } = await ratelimit.other.limit("game.getRandom");
-      if (!success) {
-        throw new TRPCError({
-          code: "TOO_MANY_REQUESTS",
-          message: "Server is busy, try again later",
-        });
-      }
-
       const randomSongPath = await redis.get<string>(
         `${RANDOM_GAME_ID_PREFIX}:${input.randomGameID}`
       );
@@ -126,7 +121,7 @@ export const gameRouter = createTRPCRouter({
         });
       }
 
-      const songData = await lyricsRouterCaller.fromAZpath({
+      const songData = await lyricsCaller.fromAZpath({
         path: randomSongPath,
       });
       if (!songData) {
@@ -143,89 +138,64 @@ export const gameRouter = createTRPCRouter({
     }),
 
   start: publicProcedure
-    .input(z.object({ path: z.string().regex(/[a-z0-9]+\/[a-z0-9]+/) }))
-    .mutation(async ({ input, ctx }) => {
-      const { success } = await ratelimit.other.limit("game.start");
-      if (!success) {
-        throw new TRPCError({
-          code: "TOO_MANY_REQUESTS",
-          message: "Server is busy, try again later",
-        });
-      }
-
-      if (ctx.cookies.gameSessionID) {
-        const gameSessionID = ctx.cookies.gameSessionID;
-        const createdAt = await redis.get(gameSessionID);
-        if (createdAt) {
-          await redis.set(
-            gameSessionID,
-            {
-              path: input.path,
-              createdAt: Date.now(),
-            },
-            { ex: SESSION_EXPIRE_SECONDS }
-          );
-          return;
-        }
-      }
-      const gameSessionID = uuid();
-      await redis.set(gameSessionID, Date.now(), {
-        ex: SESSION_EXPIRE_SECONDS,
-      });
-      ctx.setCookie("gameSessionID", gameSessionID, {
+    .input(z.object({ path: z.string().regex(/[a-z0-9\-]+\/[a-z0-9\-]+/) }))
+    .mutation(async ({ input }) => {
+      const jwt = await signJWT({ path: input.path });
+      cookies().set(GAME_SESSION_JWT_COOKIE, jwt, {
         maxAge: SESSION_EXPIRE_SECONDS * 1000,
       });
     }),
 
   count: publicProcedure
-    .input(z.object({ path: z.string().regex(/[a-z0-9]+\/[a-z0-9]+/) }))
+    .input(z.object({ path: z.string().regex(/[a-z0-9\-]+\/[a-z0-9\-]+/) }))
     .mutation(async ({ input, ctx }) => {
-      const { success } = await ratelimit.other.limit("game.count");
-      if (!success) {
+      if (ctx.cookies === null) {
         throw new TRPCError({
-          code: "TOO_MANY_REQUESTS",
-          message: "Server is busy, try again later",
+          code: "BAD_REQUEST",
+          message: "No cookies",
         });
       }
 
-      const gameSessionID = ctx.cookies.gameSessionID;
-      if (!gameSessionID) {
+      const gameSessionJWT = ctx.cookies.get(GAME_SESSION_JWT_COOKIE)?.value;
+      if (!gameSessionJWT) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "No game session",
         });
       }
 
-      const data = await redis.get<{
-        path: string;
-        createdAt: number;
-      }>(gameSessionID);
-      if (!data) {
+      let payload: GameSessionJWT;
+      try {
+        const jwt = await verifyJWT(gameSessionJWT);
+        payload = jwt.payload;
+      } catch (e) {
+        console.error(e);
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "No game session",
+          message: "Invalid game session",
         });
       }
 
-      const { path, createdAt } = data;
-      if (path !== input.path) {
+      if (payload.path !== input.path) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: `gameSessionID is not for this song, expected ${path}, got ${input.path}`,
+          message: `gameSessionID is not for this song, expected ${payload.path}, got ${input.path}`,
         });
       }
-      if (Date.now() - createdAt < MIN_PLAYTIME_SECONDS * 1000) {
+      if (Date.now() - payload.iat * 1000 < MIN_PLAYTIME_SECONDS * 1000) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Not enough playtime",
         });
       }
 
+      if (process.env.NODE_ENV !== "production") return;
+
       try {
         await db
-          .update(songs)
-          .set({ timesPlayed: sql`${songs.timesPlayed} + 1` })
-          .where(eq(songs.path, input.path))
+          .update(songs_select)
+          .set({ timesPlayed: sql`${songs_select.timesPlayed} + 1` })
+          .where(eq(songs_select.path, input.path))
           .execute();
       } catch (e) {
         console.error(e);
@@ -236,3 +206,42 @@ export const gameRouter = createTRPCRouter({
       }
     }),
 });
+
+const secret = new TextEncoder().encode(env.JWT_SECRET);
+const alg = "HS256" as const;
+const issuer = "guess-the-lyrics.vercel.app" as const;
+const audience = "guess-the-lyrics.vercel.app" as const;
+
+async function signJWT(payload: Record<string, unknown>) {
+  const jwt = await new jose.SignJWT(payload)
+    .setProtectedHeader({ alg })
+    .setIssuer(issuer)
+    .setAudience(audience)
+    .setIssuedAt()
+    .setExpirationTime("1h")
+    .sign(secret);
+
+  return jwt;
+}
+
+const GameSessionJWTSchema = z.object({
+  path: z.string(),
+  iss: z.literal("guess-the-lyrics.vercel.app"),
+  aud: z.literal("guess-the-lyrics.vercel.app"),
+  iat: z.number(),
+  exp: z.number(),
+});
+
+type GameSessionJWT = z.infer<typeof GameSessionJWTSchema>;
+
+async function verifyJWT(jwt: string) {
+  const { payload, protectedHeader } = await jose.jwtVerify(jwt, secret, {
+    issuer,
+    audience,
+  });
+  const safePayload = GameSessionJWTSchema.parse(payload);
+  return {
+    payload: safePayload,
+    protectedHeader,
+  };
+}

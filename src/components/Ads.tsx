@@ -1,6 +1,6 @@
 import Script from "next/script";
 
-import { env } from "@/env.mjs";
+import { env } from "@/env";
 
 export function InArticleAd() {
   return (

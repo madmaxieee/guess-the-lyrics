@@ -1,33 +1,19 @@
 {
   "version": "5",
-  "dialect": "mysql",
+  "dialect": "sqlite",
   "entries": [
     {
       "idx": 0,
       "version": "5",
-      "when": 1692775842145,
-      "tag": "0000_crazy_lionheart",
+      "when": 1710481842286,
+      "tag": "0000_tearful_donald_blake",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "5",
-      "when": 1692826737728,
-      "tag": "0001_absurd_killmonger",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1692902114726,
-      "tag": "0002_sloppy_phil_sheldon",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1692978688748,
-      "tag": "0003_public_manta",
+      "when": 1713244388387,
+      "tag": "0001_nosy_roughhouse",
       "breakpoints": true
     }
   ]

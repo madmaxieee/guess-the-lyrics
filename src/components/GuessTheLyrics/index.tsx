@@ -1,19 +1,21 @@
+"use client";
+
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Skeleton } from "../ui/skeleton";
-import { DialogDescription } from "@radix-ui/react-dialog";
 import { Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
 import { useImmer } from "use-immer";
 
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { api } from "@/utils/api";
+import { api } from "@/trpc/react";
 import { MIN_PLAYTIME_SECONDS } from "@/utils/constants";
 import { type RouterOutput } from "@/utils/routerTypes";
-import { cn } from "@/utils/ui";
 
 import Timer from "./Timer";
+import WinDialog from "./WinDialog";
+import WordDisplay from "./WordDisplay";
 
 type GuessTheLyricsProps = {
   songData: Exclude<RouterOutput["lyrics"]["fromAZpath"], null>;
@@ -34,12 +36,38 @@ export default function GuessTheLyrics({
   const [showWinDialog, setShowWinDialog] = useState(false);
   const [hideInfo, setHideInfo] = useState(initialHideInfo ?? false);
 
-  const answerArray = useMemo(() => lyrics.split(/\s+/), [lyrics]);
-  const totalWords = useMemo(() => answerArray.length, [answerArray]);
+  const answerArray = useMemo(
+    () =>
+      lyrics
+        .split("\n")
+        .reduce((acc, line) => {
+          const words = line.split(/\s+/);
+          words.push("\n");
+          acc.push(...words);
+          return acc;
+        }, [] as string[])
+        .filter((w) => w !== ""),
+    [lyrics]
+  );
+  const totalWords = useMemo(
+    () => answerArray.filter((w) => w !== "\n").length,
+    [answerArray]
+  );
+  const wordsMap = useMemo(() => {
+    const map: Record<string, number[]> = {};
+    answerArray.forEach((word, index) => {
+      const key = toKey(word);
+      if (key === "") return;
+      map[key] ??= [];
+      map[key]!.push(index);
+    });
+    return map;
+  }, [answerArray]);
   const answerMap = useMemo(() => {
     const map: Record<string, number[]> = {};
     answerArray.forEach((word, index) => {
       const key = toKey(word);
+      if (key === "") return;
       map[key] ??= [];
       map[key]!.push(index);
     });
@@ -50,6 +78,7 @@ export default function GuessTheLyrics({
     answerArray.map(() => false)
   );
   const [lastCorrect, setLastCorrect] = useState<Set<number>>(new Set());
+  const [guessedWords, setGuessedWords] = useState<Set<number>>(new Set());
 
   const startGame = api.game.start.useMutation();
   const countPlay = api.game.count.useMutation();
@@ -70,10 +99,12 @@ export default function GuessTheLyrics({
     if (gameState === "NOT_STARTED") setGameState("RUNNING");
 
     const key = toKey(word);
-    if (answerMap[key]) {
+
+    if (key in answerMap) {
       const correctIndices = [...answerMap[key]!];
 
       setLastCorrect(new Set(correctIndices));
+      setGuessedWords(new Set());
 
       setIsCorrect((draft) => {
         correctIndices.forEach((index) => {
@@ -81,16 +112,20 @@ export default function GuessTheLyrics({
         });
       });
 
-      const newScore = score + correctIndices.length;
-      setScore(newScore);
-      if (newScore === totalWords) {
-        setGameState("ENDED");
-        setShowWinDialog(true);
-      }
-
+      setScore((_score) => _score + correctIndices.length);
       setCurrentWord("");
 
       delete answerMap[key];
+
+      if (Object.keys(answerMap).length == 0) {
+        setGameState("ENDED");
+        setShowWinDialog(true);
+      }
+    } else if (key in wordsMap) {
+      const guessedIndices = [...wordsMap[key]!];
+      setLastCorrect(new Set());
+      setGuessedWords(new Set(guessedIndices));
+      setCurrentWord(word);
     } else {
       setCurrentWord(word);
     }
@@ -133,9 +168,11 @@ export default function GuessTheLyrics({
                 <h1 className="my-6 text-6xl font-extrabold max-md:my-0 max-md:text-3xl">
                   {title}
                 </h1>
-                <h2 className="text-4xl font-extrabold max-md:text-2xl">
-                  {artist}
-                </h2>
+                <Link href={`/artists/${path.split("/")[0]}`}>
+                  <h2 className="text-4xl font-extrabold underline max-md:text-2xl">
+                    {artist}
+                  </h2>
+                </Link>
                 <p className="text-3xl max-md:text-xl">{album}</p>
               </div>
             </>
@@ -191,34 +228,24 @@ export default function GuessTheLyrics({
             className="hidden grow text-xl max-md:block max-md:w-4/5"
           />
         </div>
-
-        <p className="font-mono text-xl text-gray-500 max-md:mx-2">
+        <p className="text-center font-mono text-xl text-gray-500 max-md:mx-2">
           {answerArray.map((word, index) => (
-            <span
+            <WordDisplay
               key={index}
-              className={cn(
-                gameState === "ENDED" && !isCorrect[index]
-                  ? "text-red-500"
-                  : gameState !== "ENDED" && lastCorrect.has(index)
-                  ? "text-green-500"
-                  : null
-              )}
-            >
-              {gameState === "ENDED" || isCorrect[index]
-                ? word + " "
-                : "_".repeat(word.length) + " "}
-            </span>
+              word={word}
+              isCorrectWord={!!isCorrect[index]}
+              isGameEnded={gameState === "ENDED"}
+              isGuessedWord={guessedWords.has(index)}
+              isLastCorrectWord={lastCorrect.has(index)}
+            />
           ))}
         </p>
       </div>
-      <Dialog open={showWinDialog} onOpenChange={setShowWinDialog}>
-        <DialogContent>
-          <DialogTitle className="text-3xl">You win!</DialogTitle>
-          <DialogDescription className="text-xl">
-            {`Now you can brag about your score to your friends! You are a true ${artist} fan!`}
-          </DialogDescription>
-        </DialogContent>
-      </Dialog>
+      <WinDialog
+        showWinDialog={showWinDialog}
+        setShowWinDialog={setShowWinDialog}
+        artist={artist ?? ""}
+      />
     </>
   );
 }

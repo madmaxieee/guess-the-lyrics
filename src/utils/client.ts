@@ -10,7 +10,7 @@ export function songurl2path(url: string): string {
 }
 
 export function songpath2url(path: string): string {
-  if (!/^[a-z0-9]+\/[a-z0-9]+$/.test(path)) {
+  if (!/^[a-z0-9\-]+\/[a-z0-9\-]+$/.test(path)) {
     throw new Error(`Invalid path: ${path}`);
   }
   return `https://www.azlyrics.com/lyrics/${path}.html`;

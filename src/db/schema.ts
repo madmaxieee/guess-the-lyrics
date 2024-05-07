@@ -1,30 +1,28 @@
 import {
   customType,
-  serial,
-  mysqlTable,
-  varchar,
-  mediumint,
+  sqliteTable,
+  text,
   index,
-  timestamp,
-} from "drizzle-orm/mysql-core";
+  integer,
+} from "drizzle-orm/sqlite-core";
 
-const artist_key = customType<{ data: string }>({
+const artist_key = customType<{ data: string; notNull: true; default: true }>({
   dataType() {
-    return `VARCHAR(128) AS (SUBSTRING_INDEX(path, '/', 1)) STORED`;
+    return `TEXT GENERATED ALWAYS AS (substr(path, 1, instr(path, '/') - 1))`;
   },
 });
 
-export const songs = mysqlTable(
+export const songs_select = sqliteTable(
   "songs",
   {
-    id: serial("id").primaryKey(),
-    path: varchar("path", { length: 256 }).unique().notNull(),
-    title: varchar("title", { length: 128 }),
-    artist: varchar("artist", { length: 128 }),
-    lyrics: varchar("lyrics", { length: 10000 }),
-    album: varchar("album", { length: 128 }),
-    coverPhotoURL: varchar("cover_photo_url", { length: 128 }),
-    timesPlayed: mediumint("times_played").default(0),
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    path: text("path", { length: 256 }).unique().notNull(),
+    title: text("title", { length: 128 }),
+    artist: text("artist", { length: 128 }),
+    album: text("album", { length: 128 }),
+    lyrics: text("lyrics", { length: 10000 }),
+    coverPhotoURL: text("cover_photo_url", { length: 128 }),
+    timesPlayed: integer("times_played").default(0),
     artistKey: artist_key("artist_key"),
   },
   (table) => ({
@@ -34,17 +32,39 @@ export const songs = mysqlTable(
   })
 );
 
-export type Song = typeof songs.$inferSelect;
-export type NewSong = typeof songs.$inferInsert;
+export type Song = typeof songs_select.$inferSelect;
 
-export const artists = mysqlTable(
+export const artists = sqliteTable(
   "artists",
   {
-    id: serial("id").primaryKey(),
-    key: varchar("key", { length: 128 }).unique().notNull(),
-    lastSongListUpdate: timestamp("last_song_list_update"),
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    key: text("key", { length: 128 }).unique().notNull(),
+    lastSongListUpdate: integer("last_song_list_update", { mode: "timestamp" }),
   },
   (table) => ({
     key_index: index("key_index").on(table.key),
+  })
+);
+
+type SearchResults = {
+  title: string;
+  url: string;
+}[];
+
+export const search_cache = sqliteTable(
+  "search_cache",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    query: text("query", { length: 256 }).unique().notNull(),
+    searchMode: text("search_mode", {
+      length: 8,
+      enum: ["artists", "songs"],
+    }).notNull(),
+    results: text("text", { mode: "json" }).$type<SearchResults>().notNull(),
+    lastUpdate: integer("last_update", { mode: "timestamp" }).notNull(),
+  },
+  (table) => ({
+    query_index: index("query_index").on(table.query),
+    lastUpdate_index: index("last_update_index").on(table.lastUpdate),
   })
 );
