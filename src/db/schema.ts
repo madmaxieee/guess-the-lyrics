@@ -6,8 +6,6 @@ import {
   integer,
 } from "drizzle-orm/sqlite-core";
 
-import type { RouterOutput } from "@/utils/routerTypes";
-
 const artist_key = customType<{ data: string; notNull: true; default: true }>({
   dataType() {
     return `TEXT GENERATED ALWAYS AS (substr(path, 1, instr(path, '/') - 1))`;

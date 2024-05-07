@@ -32,7 +32,7 @@
   "include": [
     ".eslintrc.cjs",
     "next-env.d.ts",
-    "next-sitemap.config.js",
+    "next-sitemap.config.cjs",
     "**/*.ts",
     "**/*.tsx",
     "**/*.cjs",

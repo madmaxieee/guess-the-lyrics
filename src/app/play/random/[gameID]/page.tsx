@@ -4,7 +4,9 @@ import GuessTheLyrics from "@/components/GuessTheLyrics";
 import { api } from "@/trpc/server";
 import { makeMetadata } from "@/utils/metadata";
 
-export const metadata = makeMetadata({});
+export function generateMetadata() {
+  return makeMetadata({});
+}
 
 export default async function GamePage({
   params: { gameID },

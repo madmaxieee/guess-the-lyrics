@@ -8,7 +8,7 @@
     "dev": "next dev",
     "lint": "next lint",
     "start": "next start",
-    "postbuild": "next-sitemap",
+    "postbuild": "next-sitemap --config next-sitemap.config.cjs",
     "generate": "drizzle-kit generate:sqlite",
     "migrate": "bun ./scripts/migrate.ts"
   },
